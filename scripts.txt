@@ -1,0 +1,3 @@
+[android]
+generate_build=cd android && ./gradlew assembleRelease && cd ../
+apk_path=android/app/build/outputs/apk/app-release.apk

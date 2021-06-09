@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">NAJ Desk</string>
+    <string moduleConfig="true" name="CodePushDeploymentKey">jk3dvgbvkDra1ZPf2ma3aMjI-6R13r46pp_8W</string>
+</resources>
