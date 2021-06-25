@@ -9,6 +9,7 @@ const INITIAL_STATE = {
   financeFilter: 1,
   dashboard: {},
   pesquisas: [],
+  message: '',
 };
 
 export default function auth(state = INITIAL_STATE, action) {
@@ -57,6 +58,10 @@ export default function auth(state = INITIAL_STATE, action) {
       }
       case '@auth/LOAD_PESQUISAS': {
         draft.pesquisas = action.payload.pesquisas;
+        break;
+      }
+      case '@auth/LOGIN_MESSAGE': {
+        draft.message = action.payload.message;
         break;
       }
       default: {

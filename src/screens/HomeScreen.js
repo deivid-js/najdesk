@@ -14,7 +14,7 @@ import AsyncStorage from '@react-native-community/async-storage';
 
 import ADVService from '../services/adv';
 import CPanelService from '../services/cpanel';
-import { changeAdv } from '../store/modules/auth/actions';
+import { changeAdv, signOut } from '../store/modules/auth/actions';
 import getUserInfo from '../utils/getUserInfo';
 
 import { clearLastReceived } from '../store/modules/notification/actions';
@@ -143,7 +143,7 @@ export default function HomeScreen() {
 
   function getUrlBase() {
     if (__DEV__) {
-      //return 'http://192.168.58.1:8001/';
+      return 'http://192.168.56.1:8001/';
     }
 
     const url = String(auth.adv.url_base).replace(/\/+$/, '');
@@ -158,18 +158,22 @@ export default function HomeScreen() {
 
   async function loadDashboard(useDefault = true) {
     let hasError = false;
+    let errorMessage = '';
     let ext = '';
 
     try {
       const _urlBase = useDefault ? '' : getUrlBase();
+      const deviceData = await getUserInfo();
 
       const res = await ADVService.post(`${_urlBase}api/v1/app/home`, {
         chat_id: auth.dashboard.chat_info.id_chat,
+        device: deviceData,
       });
 
       const { data } = res;
 
       if (String(data.status_code) !== '200') {
+        errorMessage = data?.naj?.mensagem || '';
         hasError = true;
       } else {
         const primeiro_acesso = String(data.naj.primeiro_acesso) === '1';
@@ -213,8 +217,13 @@ export default function HomeScreen() {
     }
 
     if (hasError) {
-      //Alert.alert('Atenção', ADVService.defaults.baseURL);
-      Alert.alert('Atenção', 'Houve um erro ao executar a requisição.');
+      if (errorMessage != 'desativado') {
+        Alert.alert('Atenção', 'Houve um erro ao executar a requisição.');
+      } else {
+        Alert.alert('Atenção', 'Esse dispositivo está desativado.', [
+          { text: 'OK', onPress: () => dispatch(signOut()) }
+        ]);
+      }
     }
 
     setLoading(false);

@@ -5,7 +5,7 @@ import * as Yup from 'yup';
 import { Form } from '@unform/mobile';
 
 // actions
-import { signInRequest } from '../store/modules/auth/actions';
+import { signInRequest, loginMessage } from '../store/modules/auth/actions';
 
 // components
 import NajButton from '../components/NajButton';
@@ -36,6 +36,7 @@ function LoadingComponent() {
 
 export default function LoginScreen() {
   const { loading } = useSelector(state => state.auth);
+  const { login } = useSelector(state => state.auth);
   const dispatch = useDispatch();
   const formRef = useRef(null);
 
@@ -153,6 +154,10 @@ export default function LoginScreen() {
     return colors.pButtonDark;
   }
 
+  React.useEffect(() => {
+    console.tron.log(login);
+  }, []);
+
   return (
     <>
       <Form ref={formRef} onSubmit={handleSubmit}>
@@ -186,6 +191,8 @@ export default function LoginScreen() {
       </Form>
 
       {loading && <LoadingComponent />}
+
+      {login?.message}
 
       {errors.length > 0 && (
         <View style={styles.errorList}>

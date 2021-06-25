@@ -8,6 +8,8 @@ import { refreshLogoAfter30Days } from '../../../utils/logo';
 
 import {
   signInSuccess,
+  signOut,
+  loginMessage,
   loadingEnd,
   loadingStart,
   refreshDashboard,
@@ -41,6 +43,10 @@ export function* signIn({ payload }) {
         }`;
 
       yield put(signInSuccess(naj.accessToken, naj.user));
+    } else if (naj.mensagem == 'desativado') {
+      yield put(loadingEnd());
+
+      Alert.alert('Atenção', 'Esse dispositivo está desativado.');
     } else {
       yield put(loadingEnd());
 
@@ -66,6 +72,8 @@ export function* changeAdv({ payload }) {
     newUrl = url + ext;
   }
 
+  newUrl = 'http://192.168.56.1:8001'
+
   ADVService.defaults.baseURL = newUrl;
   //ADVService.defaults.baseURL = adv.url_base;
   if (adv.url_base[adv.url_base.length - 1] !== '/') {
@@ -90,7 +98,10 @@ export function* changeAdv({ payload }) {
 
       refreshLogoAfter30Days(_adv, 'FORCE');
 
-
+    } else if (naj?.mensagem == 'desativado') {
+      //
+      yield put(loginMessage('Esse dispositivo está desativado.'));
+      yield put(signOut());
     } else {
       Alert.alert(
         'Atenção',

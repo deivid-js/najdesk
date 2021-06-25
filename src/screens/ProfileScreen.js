@@ -72,7 +72,7 @@ export default function ProfileScreen() {
   }
 
   function getTerms() {
-    const linkText = 'https://www.najsistemas.com.br/termosdeuso/termos_naj_desk_abril_2021.pdf';
+    const linkText = 'https://www.najsistemas.com.br/termosdeuso/termos_naj_desk_maio_2021.pdf';
 
     return (
       <Modal animationType="slide" visible={modalVisible}>

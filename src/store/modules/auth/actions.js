@@ -64,3 +64,10 @@ export function loadPesquisasAction(pesquisas) {
     payload: { pesquisas },
   };
 }
+
+export function loginMessage(message) {
+  return {
+    type: '@auth/LOGIN_MESSAGE',
+    payload: { message }
+  };
+}
