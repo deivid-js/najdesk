@@ -155,7 +155,7 @@ export default function LoginScreen() {
   }
 
   React.useEffect(() => {
-    console.tron.log(login);
+    // console.tron.log(login);
   }, []);
 
   return (

@@ -72,7 +72,7 @@ export function* changeAdv({ payload }) {
     newUrl = url + ext;
   }
 
-  newUrl = 'http://192.168.56.1:8001'
+  // newUrl = 'http://192.168.56.1:8001'
 
   ADVService.defaults.baseURL = newUrl;
   //ADVService.defaults.baseURL = adv.url_base;

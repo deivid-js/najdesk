@@ -556,10 +556,6 @@ export default function ChatScreen({ route, navigator }) {
 
     Sound.setCategory('Playback', true);
 
-    //const _audioInterval = setInterval(setIntervalAudio, 1000);
-
-    //setAudioInterval(_audioInterval);
-
     checkPermissions();
 
     return () => {
@@ -624,42 +620,6 @@ export default function ChatScreen({ route, navigator }) {
 
     // mensagem de texto
     if (String(item.tipo) === '0') {
-      /*if (item.conteudo.indexOf('http') === 0) {
-        const bgDefault = isOwner ? 'rgb(196, 220, 176)' : 'rgb(230, 230, 230)';
-        const bgImage = isOwner ? 'rgb(174, 196, 156)' : 'rgb(220, 220, 220)';
-
-        return (
-          <Autolink
-            text={item.conteudo}
-            component={View}
-            stripPrefix={false}
-            renderText={text => <NajText>{text}</NajText>}
-            renderLink={link => (
-              <View style={[styles.urlPreview, { backgroundColor: bgDefault }]}>
-                <RNUrlPreview
-                  text={link}
-                  titleStyle={styles.urlPreviewTitle}
-                  containerStyle={styles.urlPreviewContainer}
-                  imageStyle={[
-                    styles.urlPreviewImage,
-                    { backgroundColor: bgImage },
-                  ]}
-                  textContainerStyle={[
-                    styles.urlPreviewTextContainer,
-                    { backgroundColor: bgDefault },
-                  ]}
-                  descriptionNumberOfLines={2}
-                  titleNumberOfLines={3}
-                />
-                <NajText numberOfLines={1} style={styles.urlPreviewErrorText}>
-                  <Autolink text={link} />
-                </NajText>
-              </View>
-            )}
-          />
-        );
-      }*/
-
       if (item.conteudo.indexOf('<') > -1 && item.conteudo.indexOf('>') > -1) {
         let newHtml = item.conteudo;
         const regex = new RegExp(/font-size:\s.?[0-9]{0,}.?[0-9]{1,}rem/g, 'ig');
@@ -1071,10 +1031,11 @@ export default function ChatScreen({ route, navigator }) {
     setLoadingMore(false);
   }
 
-  function launchCamera() {
+  async function launchCamera() {
     let options = {
       mediaType: 'photo',
       includeBase64: true,
+      saveToPhotos: true,
       storageOptions: {
         skipBackup: true,
         path: 'NAJDesk/Imagens',
@@ -1084,6 +1045,14 @@ export default function ChatScreen({ route, navigator }) {
     ImagePicker.launchCamera(options, res => {
       if (!res.didCancel && !res.error) {
         handleSendMessageImage(res);
+      } else if (res.error) {
+        errorMessage = '';
+
+        if (__DEV__) {
+          errorMessage = JSON.stringify(res.error);
+        }
+
+        Alert.alert('Atenção', `Erro ao abrir a câmera. ${errorMessage}`);
       }
     });
   }
