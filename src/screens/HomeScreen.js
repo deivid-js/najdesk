@@ -3,6 +3,7 @@ import { Alert, View, ActivityIndicator, Modal, TextInput } from 'react-native';
 import { RectButton, ScrollView } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useSelector, useDispatch } from 'react-redux';
 import { useIsFocused } from '@react-navigation/native';
 import Image from 'react-native-scalable-image';
@@ -78,6 +79,7 @@ export default function HomeScreen() {
   const [monthAtivities, setMonthAtivities] = React.useState(0);
   const [totalProcess, setTotalProcess] = React.useState(0);
   const [totalProcess30Days, setTotalProcess30Days] = React.useState(0);
+  const [totalEvents, setTotalEvents] = React.useState(0);
 
   async function monitora(rotina) {
     try {
@@ -143,7 +145,8 @@ export default function HomeScreen() {
 
   function getUrlBase() {
     if (__DEV__) {
-      return 'http://192.168.56.1:8001/';
+      return 'http://192.168.1.3:8000/';
+      return 'http://najadvweb.com/';
     }
 
     const url = String(auth.adv.url_base).replace(/\/+$/, '');
@@ -189,6 +192,9 @@ export default function HomeScreen() {
         // processos
         setTotalProcess(data.naj.processos.total);
         setTotalProcess30Days(data.naj.processos?.trinta_dias || 0);
+
+        // eventos
+        setTotalEvents(data.naj.eventos.total);
 
         // a pagor
         setToPayValue(data.naj.valor_pagar.finalizado);
@@ -407,6 +413,8 @@ export default function HomeScreen() {
       handleNavigateProcessActivities(processId);
     } else if (lastNotification?.lastAction === '@ACT/open_activities' && isSameAdv && isSameUser) { // abre a tabela de 'ATIVIDADES'
       handleNavigateActivities();
+    } else if (lastNotification?.lastAction === '@ACT/open_events' && isSameAdv && isSameUser) { // abre a tabela de 'AGENDAMENTOS'
+      handleNavigateAgenda();
     } else if (lastNotification?.lastAction === '@ACT/release_adv' && isSameUser) {
       handleNavigateAdvChoice();
     } else if (lastNotification?.lastAction === '@ACT/new_message' && isSameAdv && isSameUser) {
@@ -514,6 +522,26 @@ export default function HomeScreen() {
             {totalProcess30Days}
           </NajText>
         )}
+      </View>
+    );
+  }
+
+  function getBadgeEventContainer() {
+    return (
+      <View style={{ flexDirection: 'row' }}>
+        <NajText
+          style={{
+            backgroundColor: '#d00',
+              fontSize: 12,
+              color: '#fff',
+              textAlign: 'center',
+              paddingVertical: 2,
+              paddingHorizontal: 6,
+              borderRadius: 50,
+              fontWeight: 'bold',
+          }}>
+          {totalEvents}
+        </NajText>
       </View>
     );
   }
@@ -865,12 +893,13 @@ export default function HomeScreen() {
     return (
       <>
         <View style={styles.headerTop}>
-          <RectButton
+          {/* <RectButton
             style={styles.headerIcon}
             onPress={handleNavigateAdvChoice}>
             <MaterialIcon size={28} color="#fff" name="swap-horiz" />
-          </RectButton>
-          <View style={{ flex: 1 }}>
+          </RectButton> */}
+          <View style={{ flex: 1, paddingHorizontal: 20 }}>
+            <MaterialCommunityIcon size={28} color="#fff" name="add" />
             <NajText style={styles.advName}>{getUserName()}</NajText>
           </View>
         </View>
@@ -896,11 +925,12 @@ export default function HomeScreen() {
         {getModalPesquisaNps()}
 
         <View style={styles.headerTop}>
-          <RectButton
+          {/* <RectButton
             style={styles.headerIcon}
             onPress={handleNavigateAdvChoice}>
             <MaterialIcon size={28} color="#fff" name="swap-horiz" />
-          </RectButton>
+          </RectButton> */}
+          <MaterialCommunityIcon style={styles.headerIcon} size={28} color="#fff" name="briefcase" />
           <View style={{ flex: 1 }}>
             <NajText style={styles.advName}>{auth.adv.nome}</NajText>
             <NajText style={styles.userName}>{getUserName()}</NajText>
@@ -966,7 +996,7 @@ export default function HomeScreen() {
               title="Agendamentos"
               icon="calendar"
               onPress={handleNavigateAgenda}
-            //badges={[() => getBadgeContainer('1')]}
+            badges={[getBadgeEventContainer]}
             />
           </View>
 

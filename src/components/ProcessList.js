@@ -91,243 +91,272 @@ const styles = StyleSheet.create({
 });
 
 export default function ProcessList({ data, ...rest }) {
-  const navigation = useNavigation();
+	const navigation = useNavigation();
 
-  function navigatePartsOfTheProcess(id) {
-    navigation.navigate('PartsOfTheProcessList', { id });
-  }
+	function navigatePartsOfTheProcess(id) {
+		navigation.navigate('PartsOfTheProcessList', { id });
+	}
 
-  function navigateProgressOfTheProcessList(id) {
-    navigation.navigate('ProgressOfTheProcessList', { id });
-  }
+	function navigateProgressOfTheProcessList(id) {
+		navigation.navigate('ProgressOfTheProcessList', { id });
+	}
 
-  function navigateProcessActivitiesList(id) {
-    navigation.navigate('ProcessActivitiesList', { id });
-  }
+	function navigateProcessActivitiesList(id) {
+		navigation.navigate('ProcessActivitiesList', { id });
+	}
 
-  function dbDateToMoment(dbDate) {
-    if (!dbDate) {
-      return false;
-    }
+	function navigateAttachmentProcessList(id) {
+		navigation.navigate('AttachmentProcessList', { id });
+	}
 
-    const arr = String(dbDate).split('/');
+	function dbDateToMoment(dbDate) {
+		if (!dbDate)
+			return false;
 
-    if (arr.length != 3) {
-      return false;
-    }
+		const arr = String(dbDate).split('/');
 
-    return `${arr[2]}-${arr[1]}-${arr[0]} 00:00:00`;
-  }
+		if (arr.length != 3)
+			return false;
 
-  function handleRenderItem(item, index) {
-    const itemBgColor = (index + 2) % 2 === 0 ? '#fff' : 'rgb(243, 243, 243)';
+		return `${arr[2]}-${arr[1]}-${arr[0]} 00:00:00`;
+	}
 
-    // atividade
-    let spendedTimeActivityText = false;
-    let itemActivityDate = dbDateToMoment(item.ULTIMA_ATIVIDADE_DATA);
+	function handleRenderItem(item, index) {
+		const itemBgColor = (index + 2) % 2 === 0 ? '#fff' : 'rgb(243, 243, 243)';
 
-    if (itemActivityDate) {
-      const totalDiffActivity = moment().diff(moment(itemActivityDate), 'days');
+		// atividade
+		let spendedTimeActivityText = false;
+		let itemActivityDate = dbDateToMoment(item.ULTIMA_ATIVIDADE_DATA);
 
-      if (totalDiffActivity == 0) {
-        spendedTimeActivityText = 'Hoje';
-      } else if (totalDiffActivity == 1) {
-        spendedTimeActivityText = 'Há 1 dia';
-      } else if (totalDiffActivity >= 2 && totalDiffActivity <= 30) {
-        spendedTimeActivityText = `Há ${totalDiffActivity} dias`;
-      }
-    }
+		if (itemActivityDate) {
+			const totalDiffActivity = moment().diff(moment(itemActivityDate), 'days');
 
-    // andamento
-    let spendedTimeAndamentoText = false;
-    let itemAndamentoDate = dbDateToMoment(item.ULTIMO_ANDAMENTO_DATA);
+			if (totalDiffActivity == 0) {
+				spendedTimeActivityText = 'Hoje';
+			} else if (totalDiffActivity == 1) {
+				spendedTimeActivityText = 'Há 1 dia';
+			} else if (totalDiffActivity >= 2 && totalDiffActivity <= 30) {
+				spendedTimeActivityText = `Há ${totalDiffActivity} dias`;
+			}
+		}
 
-    if (itemAndamentoDate) {
-      const totalDiffAndamento = moment().diff(moment(itemAndamentoDate), 'days');
+		// andamento
+		let spendedTimeAndamentoText = false;
+		let itemAndamentoDate = dbDateToMoment(item.ULTIMO_ANDAMENTO_DATA);
 
-      if (totalDiffAndamento == 0) {
-        spendedTimeAndamentoText = 'Hoje';
-      } else if (totalDiffAndamento == 1) {
-        spendedTimeAndamentoText = 'Há 1 dia';
-      } else if (totalDiffAndamento >= 2 && totalDiffAndamento <= 30) {
-        spendedTimeAndamentoText = `Há ${totalDiffAndamento} dias`;
-      }
-    }
+		if (itemAndamentoDate) {
+			const totalDiffAndamento = moment().diff(moment(itemAndamentoDate), 'days');
 
-    return (
-      <View style={[styles.itemContainer, { backgroundColor: itemBgColor }]}>
-        <View style={styles.mainRow}>
-          <View style={styles.leftSideMainRow}>
-            <MaterialCommunityIcon
-              size={24}
-              color="#000"
-              name="scale-balance"
-              style={styles.mainIcon}
-            />
+			if (totalDiffAndamento == 0) {
+				spendedTimeAndamentoText = 'Hoje';
+			} else if (totalDiffAndamento == 1) {
+				spendedTimeAndamentoText = 'Há 1 dia';
+			} else if (totalDiffAndamento >= 2 && totalDiffAndamento <= 30) {
+				spendedTimeAndamentoText = `Há ${totalDiffAndamento} dias`;
+			}
+		}
 
-            <View style={styles.titleContainer}>
-              <NajText style={styles.title} numberOfLines={1}>
-                {item.NOME_CLIENTE}
-              </NajText>
-              <NajText style={styles.subTitle} numberOfLines={1}>
-                x {item.NOME_ADVERSARIO}
-              </NajText>
-            </View>
-          </View>
+		return (
+			<View style={[styles.itemContainer, { backgroundColor: itemBgColor }]}>
+				<View style={styles.mainRow}>
+				<View style={styles.leftSideMainRow}>
+					<MaterialCommunityIcon
+					size={24}
+					color="#000"
+					name="scale-balance"
+					style={styles.mainIcon}
+					/>
 
-          <RectButton
-            style={styles.button}
-            onPress={() => navigatePartsOfTheProcess(item.CODIGO_PROCESSO)}>
-            <MaterialIcon size={24} color="#000" name="arrow-forward" />
-          </RectButton>
-        </View>
+					<View style={styles.titleContainer}>
+						<NajText style={styles.title} numberOfLines={1}>
+							{item.NOME_CLIENTE}
+						</NajText>
+						<NajText style={styles.subTitle} numberOfLines={1}>
+							x {item.NOME_ADVERSARIO}
+						</NajText>
+					</View>
+				</View>
 
-        <View style={styles.row}>
-          {/* cartório */}
-          <View style={styles.withMarginRight}>
-            <NajText numberOfLines={1}>
-              {item.CARTORIO} - {item.COMARCA} / {item.COMARCA_UF}
-            </NajText>
-            <NajText style={styles.withFlex} numberOfLines={1}>
-              {item.NUMERO_PROCESSO_NEW}
-            </NajText>
-            {item.CLASSE && (
-              <NajText style={styles.withFlex} numberOfLines={1}>
-                {item.CLASSE}
-              </NajText>
-            )}
-          </View>
+				<RectButton
+					style={styles.button}
+					onPress={() => navigatePartsOfTheProcess(item.CODIGO_PROCESSO)}>
+					<MaterialIcon size={24} color="#000" name="arrow-forward" />
+				</RectButton>
+				</View>
 
-          <View style={styles.line} />
+				<View style={styles.row}>
+				{/* cartório */}
+				<View style={styles.withMarginRight}>
+					<NajText numberOfLines={1}>
+					{item.CARTORIO} - {item.COMARCA} / {item.COMARCA_UF}
+					</NajText>
+					<NajText style={styles.withFlex} numberOfLines={1}>
+					{item.NUMERO_PROCESSO_NEW}
+					</NajText>
+					{item.CLASSE && (
+					<NajText style={styles.withFlex} numberOfLines={1}>
+						{item.CLASSE}
+					</NajText>
+					)}
+				</View>
 
-          {/* último andamento */}
-          {item.ULTIMO_ANDAMENTO_DATA && (
-            <>
-              <View style={styles.statusContainer}>
-                <View style={styles.withFlex}>
-                  <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
-                    <NajText style={styles.nonInfoText}>Último andamento</NajText>
+				<View style={styles.line} />
 
-                    {spendedTimeAndamentoText && (
-                      <View style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        backgroundColor: '#F9B300',
-                        marginLeft: 5,
-                        paddingVertical: 2,
-                        paddingHorizontal: 10,
-                        borderRadius: 10,
-                      }}>
-                        <NajText style={{ fontWeight: 'bold', fontSize: 12 }}>{spendedTimeAndamentoText}</NajText>
-                      </View>
-                    )}
-                  </View>
+				{/* último andamento */}
+				{item.ULTIMO_ANDAMENTO_DATA && (
+					<>
+					<View style={styles.statusContainer}>
+						<View style={styles.withFlex}>
+						<View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
+							<NajText style={styles.nonInfoText}>Último andamento</NajText>
 
-                  <View style={styles.statusDescription}>
-                    <NajText>{item.ULTIMO_ANDAMENTO_DATA}</NajText>
+							{spendedTimeAndamentoText && (
+							<View style={{
+								flexDirection: 'row',
+								alignItems: 'center',
+								backgroundColor: '#F9B300',
+								marginLeft: 5,
+								paddingVertical: 2,
+								paddingHorizontal: 10,
+								borderRadius: 10,
+							}}>
+								<NajText style={{ fontWeight: 'bold', fontSize: 12 }}>{spendedTimeAndamentoText}</NajText>
+							</View>
+							)}
+						</View>
 
-                    <NajText numberOfLines={1} style={styles.statusText}>
-                      {item.ULTIMO_ANDAMENTO_DESCRICAO}
-                    </NajText>
-                  </View>
-                </View>
+						<View style={styles.statusDescription}>
+							<NajText>{item.ULTIMO_ANDAMENTO_DATA}</NajText>
 
-                <RectButton
-                  style={styles.button}
-                  onPress={() =>
-                    navigateProgressOfTheProcessList(item.CODIGO_PROCESSO)
-                  }>
-                  <MaterialIcon size={24} color="#000" name="arrow-forward" />
-                </RectButton>
-              </View>
+							<NajText numberOfLines={1} style={styles.statusText}>
+							{item.ULTIMO_ANDAMENTO_DESCRICAO}
+							</NajText>
+						</View>
+						</View>
 
-              <View style={styles.line} />
-            </>
-          )}
+						<RectButton
+						style={styles.button}
+						onPress={() =>
+							navigateProgressOfTheProcessList(item.CODIGO_PROCESSO)
+						}>
+						<MaterialIcon size={24} color="#000" name="arrow-forward" />
+						</RectButton>
+					</View>
 
-          {/* última atividade */}
-          {item.ULTIMA_ATIVIDADE_DATA && (
-            <>
-              <View style={styles.statusContainer}>
-                <View style={styles.withFlex}>
-                  <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
-                    <NajText style={styles.nonInfoText}>
-                      Última atividade
-                    </NajText>
-                    {spendedTimeActivityText && (
-                      <View style={{
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        backgroundColor: '#F9B300',
-                        marginLeft: 5,
-                        paddingVertical: 2,
-                        paddingHorizontal: 10,
-                        borderRadius: 10,
-                      }}>
-                        <NajText style={{ fontWeight: 'bold', fontSize: 12 }}>{spendedTimeActivityText}</NajText>
-                      </View>
-                    )}
-                  </View>
+					<View style={styles.line} />
+					</>
+				)}
 
-                  <View style={styles.statusDescription}>
-                    <NajText>{item.ULTIMA_ATIVIDADE_DATA}</NajText>
+				{/* última atividade */}
+				{item.ULTIMA_ATIVIDADE_DATA && (
+					<>
+					<View style={styles.statusContainer}>
+						<View style={styles.withFlex}>
+						<View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
+							<NajText style={styles.nonInfoText}>
+							Última atividade
+							</NajText>
+							{spendedTimeActivityText && (
+							<View style={{
+								flexDirection: 'row',
+								alignItems: 'center',
+								backgroundColor: '#F9B300',
+								marginLeft: 5,
+								paddingVertical: 2,
+								paddingHorizontal: 10,
+								borderRadius: 10,
+							}}>
+								<NajText style={{ fontWeight: 'bold', fontSize: 12 }}>{spendedTimeActivityText}</NajText>
+							</View>
+							)}
+						</View>
 
-                    <NajText numberOfLines={1} style={styles.statusText}>
-                      {item.ULTIMA_ATIVIDADE_DESCRICAO}
-                    </NajText>
-                  </View>
-                </View>
+						<View style={styles.statusDescription}>
+							<NajText>{item.ULTIMA_ATIVIDADE_DATA}</NajText>
 
-                <RectButton
-                  style={styles.button}
-                  onPress={() =>
-                    navigateProcessActivitiesList(item.CODIGO_PROCESSO)
-                  }>
-                  <MaterialIcon size={24} color="#000" name="arrow-forward" />
-                </RectButton>
-              </View>
+							<NajText numberOfLines={1} style={styles.statusText}>
+							{item.ULTIMA_ATIVIDADE_DESCRICAO}
+							</NajText>
+						</View>
+						</View>
 
-              <View style={styles.line} />
-            </>
-          )}
+						<RectButton
+						style={styles.button}
+						onPress={() =>
+							navigateProcessActivitiesList(item.CODIGO_PROCESSO)
+						}>
+						<MaterialIcon size={24} color="#000" name="arrow-forward" />
+						</RectButton>
+					</View>
 
-          {/* advogado/responsável */}
-          <View style={styles.lastRow}>
-            <View style={styles.lastRowItem}>
-              <NajText style={styles.nonInfoText}>Advogado</NajText>
-              <NajText
-                numberOfLines={1}
-                style={[styles.name, { paddingRight: 10 }]}>
-                {item.NOME_ADVOGADO}
-              </NajText>
-            </View>
+					<View style={styles.line} />
+					</>
+				)}
 
-            <View style={styles.lastRowItem}>
-              <NajText style={styles.nonInfoText}>Responsável</NajText>
-              <NajText numberOfLines={1} style={styles.name}>
-                {(item.NOME_RESPONSAVEL && item.NOME_RESPONSAVEL) || '-'}
-              </NajText>
-            </View>
-          </View>
-          <View />
-        </View>
-      </View>
-    );
-  }
+				{/* advogado/responsável */}
+				<View style={styles.lastRow}>
+					<View style={styles.lastRowItem}>
+						<NajText style={styles.nonInfoText}>Advogado</NajText>
+						<NajText
+							numberOfLines={1}
+							style={[styles.name, { paddingRight: 10 }]}>
+							{item.NOME_ADVOGADO}
+						</NajText>
+					</View>
 
-  function getItemSeparatorComponent() {
-    return <View style={styles.itemSeparator} />;
-  }
+					<View style={styles.lastRowItem}>
+						<NajText style={styles.nonInfoText}>Responsável</NajText>
+						<NajText numberOfLines={1} style={styles.name}>
+							{(item.NOME_RESPONSAVEL && item.NOME_RESPONSAVEL) || '-'}
+						</NajText>
+					</View>
+				</View>
+				<View style={styles.line} />
 
-  return (
-    <>
-      <FlatList
-        {...rest}
-        data={data}
-        keyExtractor={({ CODIGO_PROCESSO }) => String(CODIGO_PROCESSO)}
-        renderItem={({ item, index }) => handleRenderItem(item, index)}
-        ItemSeparatorComponent={getItemSeparatorComponent}
-      />
-    </>
-  );
+				{/* anexos */}
+				{item.QTD_ANEXOS > 0 && (
+					<>
+					<View style={styles.statusContainer}>
+						<View style={styles.withFlex}>
+							<View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
+								<NajText style={styles.nonInfoText}>Anexos do Processo</NajText>
+							</View>
+
+							<View style={styles.statusDescription}>
+								<NajText>Quantidade: {item.QTD_ANEXOS}</NajText>
+							</View>
+						</View>
+
+						<RectButton
+							style={styles.button}
+							onPress={() =>
+								navigateAttachmentProcessList(item.CODIGO_PROCESSO)
+							}
+						>
+						<MaterialIcon size={24} color="#000" name="arrow-forward" />
+						</RectButton>
+					</View>
+				</>
+				)}
+				<View />
+			</View>
+		</View>
+		);
+	}
+
+	function getItemSeparatorComponent() {
+		return <View style={styles.itemSeparator} />;
+	}
+
+	return (
+		<>
+			<FlatList
+				{...rest}
+				data={data}
+				keyExtractor={({ CODIGO_PROCESSO }) => String(CODIGO_PROCESSO)}
+				renderItem={({ item, index }) => handleRenderItem(item, index)}
+				ItemSeparatorComponent={getItemSeparatorComponent}
+			/>
+		</>
+	);
 }

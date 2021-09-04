@@ -35,6 +35,10 @@ export default function ProfileScreen() {
     navigation.navigate('DeviceList');
   }
 
+  function handleNavigateAdvChoice() {
+    navigation.navigate('AdvChoiceScreen');
+  }
+
   function handleRenderItem({ item }) {
     return (
       <RectButton onPress={item.onPress}>
@@ -131,6 +135,13 @@ export default function ProfileScreen() {
       title: 'Minhas Informações',
       onPress: handleNavigationMyInfos,
     });*/
+    _data.push({
+      id: '3',
+      icon: 'swap-horiz',
+      title: 'Trocar de Advocacia',
+      subtitle: 'Alternar entre prestador de serviços',
+      onPress: handleNavigateAdvChoice,
+    });
     _data.push({
       id: '3',
       icon: 'assignment',

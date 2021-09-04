@@ -15,6 +15,8 @@ import ToReceiveScreen from '../screens/ToReceiveScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import AgendaScreen from '../screens/AgendaScreen';
 import AgendamentosScreen from '../screens/AgendamentosScreen';
+import NewEventScreen from '../screens/NewEventScreen';
+import AttachmentProcessListScreen from '../screens/AttachmentProcessListScreen';
 import NotificationListScreen from '../screens/NotificationListScreen';
 import ChatScreen from '../screens/ChatScreen';
 import ActiveProcessesScreen from '../screens/ActiveProcessesScreen';
@@ -168,6 +170,14 @@ export default function AuthStackNavigator() {
         }}
       />
       <Stack.Screen
+        name="NewEvent"
+        component={NewEventScreen}
+        options={{
+          ...defaultOptions,
+          title: 'novo agendamento',
+        }}
+      />
+      <Stack.Screen
         name="Activities"
         component={ActivitiesScreen}
         options={{
@@ -253,6 +263,14 @@ export default function AuthStackNavigator() {
             elevation: 0,
           },
           title: 'processos',
+        }}
+      />
+      <Stack.Screen
+        name="AttachmentProcessList"
+        component={AttachmentProcessListScreen}
+        options={{
+          ...defaultOptions,
+          title: 'anexos do processo',
         }}
       />
     </Stack.Navigator>
