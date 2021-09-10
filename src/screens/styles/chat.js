@@ -301,6 +301,9 @@ const styles = StyleSheet.create({
   attachDescribeRight: {
     flex: 1,
   },
+  fileName: {
+    flexShrink: 1
+  }
 });
 
 export default styles;

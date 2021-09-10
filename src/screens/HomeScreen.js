@@ -145,7 +145,7 @@ export default function HomeScreen() {
 
   function getUrlBase() {
     if (__DEV__) {
-      return 'http://192.168.1.3:8000/';
+      return 'http://192.168.1.8:8000/';
       return 'http://najadvweb.com/';
     }
 
@@ -327,65 +327,64 @@ export default function HomeScreen() {
     } catch (er) { }
   }
 
-  React.useEffect(() => {
-    if (auth.pesquisas.length > 0) {
-      setCurrentPesquisa(auth.pesquisas[0]);
-      setModalPesquisaVisibleNps(true);
-    } else {
-      setModalPesquisaVisibleNps(false);
-    }
-  }, [auth.pesquisas]);
+  	React.useEffect(() => {
+		setModalPesquisaVisibleNps(false);
+		if (auth.pesquisas.length > 0) {
+			setCurrentPesquisa(auth.pesquisas[0]);
+			setModalPesquisaVisibleNps(true);
+		}
+  	}, [auth.pesquisas]);
 
-  React.useEffect(() => {
-    if (currentPesquisa.id != -1) {
-      refreshVisualizacaoPesquisa();
-    }
-  }, [currentPesquisa]);
+	React.useEffect(() => {
+		if (currentPesquisa.id != -1) {
+			refreshVisualizacaoPesquisa();
+		}
+	}, [currentPesquisa]);
 
-  React.useEffect(() => {
-    if (isFocused && isSelectedAdv && auth?.dashboard?.chat_info?.id_chat) {
-      loadAllLogoFiles();
-      loadDashboard();
-      loadLogoFile();
-    } else {
-      setLoading(false);
-    }
-  }, [isFocused]);
+	React.useEffect(() => {
+		if (isFocused && isSelectedAdv && auth?.dashboard?.chat_info?.id_chat) {
+			loadAllLogoFiles();
+			loadDashboard();
+			loadLogoFile();
+		} else {
+			setLoading(false);
+		}
+	}, [isFocused]);
 
-  React.useEffect(() => {
-    if (isFocused && isSelectedAdv && auth?.dashboard?.chat_info?.id_chat) {
-      //loadDashboard();
-    }
+	React.useEffect(() => {
+		if (isFocused && isSelectedAdv && auth?.dashboard?.chat_info?.id_chat) {
+		//loadDashboard();
+		}
 
-    if (isFocused && isSelectedAdv && auth?.dashboard?.chat_info?.id_chat) {
-      loadDashboard();
-    }
-  }, [auth.dashboard]);
+		if (isFocused && isSelectedAdv && auth?.dashboard?.chat_info?.id_chat) {
+			loadDashboard();
+		}
+	}, [auth.dashboard]);
 
-  React.useEffect(() => {
-    // recarregar a logo
-    if (auth.adv?.codigo && logoFile.advCodigo !== auth.adv.codigo) {
-      //loadAllLogoFiles();
+	React.useEffect(() => {
+		// recarregar a logo
+		if (auth.adv?.codigo && logoFile.advCodigo !== auth.adv.codigo) {
+		//loadAllLogoFiles();
 
-      loadLogoFile();
-    }
+			loadLogoFile();
+		}
 
-    // veio da notificação
-    if (auth.adv?.codigo && hasChangedAdvByNotification) {
-      setHasChangedAdvByNotification(false);
-      handleNavigateChat();
-    }
-  }, [auth.adv]);
+		// veio da notificação
+		if (auth.adv?.codigo && hasChangedAdvByNotification) {
+			setHasChangedAdvByNotification(false);
+			handleNavigateChat();
+		}
+	}, [auth.adv]);
 
-  React.useEffect(() => {
-    if (auth.adv) {
-      setIsSelectedAdv(true);
+	React.useEffect(() => {
+		if (auth.adv) {
+			setIsSelectedAdv(true);
 
-      if (auth?.dashboard?.chat_info?.id_chat) {
-        loadDashboard(false);
-      }
-    }
-  }, [auth]);
+			if (auth?.dashboard?.chat_info?.id_chat) {
+				loadDashboard(false);
+			}
+		}
+	}, [auth]);
 
   React.useEffect(() => {
     dispatch(clearLastReceived());
@@ -676,6 +675,7 @@ export default function HomeScreen() {
               if (auth.pesquisas.length == 1) {
                 setModalPesquisaVisibleNps(false);
                 setLoadingPergunta(false);
+				loadNextPesquisa();
                 return;
               }
 
@@ -686,48 +686,55 @@ export default function HomeScreen() {
           <View style={{ width: 15 }} />
           <View style={{ flex: 1 }}>
             <NajButton inModal={true} onPress={async () => {
-              // o cara respondeu
-              if (loadingPergunta) return;
+				// o cara respondeu
+				if (loadingPergunta) return;
 
-              setLoadingPergunta(true);
+				setLoadingPergunta(true);
 
-              let _pesquisas = [];
-              let newPesquisas = [];
+				let _pesquisas = [];
+				let newPesquisas = [];
 
-              try {
-                _pesquisas = await AsyncStorage.getItem(`@NAJ_AC/pesquisa_${auth.adv.codigo}`);
-                _pesquisas = JSON.parse(_pesquisas);
+				try {
+					_pesquisas = await AsyncStorage.getItem(`@NAJ_AC/pesquisa_${auth.adv.codigo}`);
+					_pesquisas = JSON.parse(_pesquisas);
 
-                if (_pesquisas && _pesquisas.find(({ id: pId }) => String(currentPesquisa.id) == String(pId))) {
-                  _pesquisas.forEach(p => {
-                    if (String(currentPesquisa.id) == String(p.id)) {
-                      newPesquisas.push({ ...p, respondido: 'S' });
-                    } else {
-                      newPesquisas.push(p);
-                    }
-                  });
-                } else {
-                  if (_pesquisas && _pesquisas.length > 0) {
-                    newPesquisas = _pesquisas;
-                  }
+					if (_pesquisas && _pesquisas.find(({ id: pId }) => String(currentPesquisa.id) == String(pId))) {
+						_pesquisas.forEach(p => {
+							if (String(currentPesquisa.id) == String(p.id)) {
+								newPesquisas.push({ ...p, respondido: 'S' });
+							} else {
+								newPesquisas.push(p);
+							}
+						});
+					} else {
+						if (_pesquisas && _pesquisas.length > 0) {
+							newPesquisas = _pesquisas;
+						}
 
-                  _pesquisas.push({ ...currentPesquisa, respondido: 'S' });
-                }
+						_pesquisas.push({ ...currentPesquisa, respondido: 'S' });
+					}
 
-                await AsyncStorage.setItem(`@NAJ_AC/pesquisa_${auth.adv.codigo}`, JSON.stringify(newPesquisas));
-              } catch (_e) { }
+					await AsyncStorage.setItem(`@NAJ_AC/pesquisa_${auth.adv.codigo}`, JSON.stringify(newPesquisas));
 
-              if (auth.pesquisas.length == 1) {
-                setModalPesquisaVisibleNps(false);
-                setLoadingPergunta(false);
-                return;
-              }
+					// requisição
+					try {
+						await ADVService.post(`/api/v1/app/pesquisas/aceito/${currentPesquisa.id}`, {
+							motivo: valueMotivoPesquisaNps,
+							nota: valuePesquisaNps
+						});
+					} catch (_err) { }
+				} catch (_e) { }
 
-              // requisição
+				if (auth.pesquisas.length == 1) {
+					setModalPesquisaVisibleNps(false);
+					setLoadingPergunta(false);
+					loadNextPesquisa();
+					return;
+				}
 
-              loadNextPesquisa();
-              setLoadingPergunta(false);
-            }}>Confirmar</NajButton>
+				loadNextPesquisa();
+				setLoadingPergunta(false);
+			}}>Confirmar</NajButton>
           </View>
         </View>
       </Modal>

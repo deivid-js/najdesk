@@ -83,7 +83,7 @@ export default function AttachmentProcessListScreen({ route }) {
            
             let itemFile = files.find(fl => fl.name === _fileName); // Buscando o arquivo
 
-            console.tron.log(itemFile);
+            // console.tron.log(itemFile);
 
             if (!itemFile) {// Verifica se já não baixou
                 const res = await ADVService.post('/api/v1/app/processos/attachment/download', {
@@ -186,7 +186,7 @@ export default function AttachmentProcessListScreen({ route }) {
                         duration={1500}
                         onPress={() => handleDownload(item)}>
                         <NajText style={styles.buttonDownload}>
-                            <MaterialCommunityIcon size={24} color="#fff" name="arrow-down-bold-circle-outline" />
+                            <MaterialCommunityIcon size={24} color="#333" name="arrow-down-bold-circle-outline" />
                         </NajText>
                     </AnimatedBtn>
                 </View>
@@ -329,7 +329,7 @@ const styles = StyleSheet.create({
     fab: {
         width: 45,
         height: 45,
-        backgroundColor: '#1e87f0',
+        backgroundColor: '#eaeaea',
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 30,

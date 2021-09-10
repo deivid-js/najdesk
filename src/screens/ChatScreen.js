@@ -748,7 +748,7 @@ export default function ChatScreen({ route, navigator }) {
             <View style={styles.audioButton}>
               <MaterialIcon size={28} name="audiotrack" color="#999" />
             </View>
-            <NajText numberOfLines={1} ellipsizeMode="middle">
+            <NajText numberOfLines={3} ellipsizeMode="middle" style={styles.fileName}>
               {item.file_origin_name}
             </NajText>
             <View style={styles.audioButton}>
@@ -768,7 +768,7 @@ export default function ChatScreen({ route, navigator }) {
             style={styles.audioButton}>
             <MaterialIcon size={32} name="play-circle-filled" color="#999" />
           </TouchableOpacity>
-          <NajText numberOfLines={1} ellipsizeMode="middle">
+          <NajText numberOfLines={3} ellipsizeMode="middle" style={styles.fileName}>
             {item.file_origin_name}
           </NajText>
         </View>

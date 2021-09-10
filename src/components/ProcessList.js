@@ -88,6 +88,10 @@ const styles = StyleSheet.create({
   withMarginRight: {
     marginRight: 15,
   },
+  iconAttachment: {
+	marginRight: 10,
+	marginTop: 10,
+  },
 });
 
 export default function ProcessList({ data, ...rest }) {
@@ -198,6 +202,9 @@ export default function ProcessList({ data, ...rest }) {
 						{item.CLASSE}
 					</NajText>
 					)}
+					<NajText style={styles.withFlex} numberOfLines={1}>
+					Código: {item.CODIGO_PROCESSO}
+					</NajText>
 				</View>
 
 				<View style={styles.line} />
@@ -317,7 +324,9 @@ export default function ProcessList({ data, ...rest }) {
 				{item.QTD_ANEXOS > 0 && (
 					<>
 					<View style={styles.statusContainer}>
+						<MaterialCommunityIcon style={styles.iconAttachment} size={24} color="#000" name="paperclip" />
 						<View style={styles.withFlex}>
+							
 							<View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
 								<NajText style={styles.nonInfoText}>Anexos do Processo</NajText>
 							</View>
