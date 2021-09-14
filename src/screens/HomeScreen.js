@@ -3,6 +3,7 @@ import { Alert, View, ActivityIndicator, Modal, TextInput } from 'react-native';
 import { RectButton, ScrollView } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useSelector, useDispatch } from 'react-redux';
 import { useIsFocused } from '@react-navigation/native';
 import Image from 'react-native-scalable-image';
@@ -78,6 +79,7 @@ export default function HomeScreen() {
   const [monthAtivities, setMonthAtivities] = React.useState(0);
   const [totalProcess, setTotalProcess] = React.useState(0);
   const [totalProcess30Days, setTotalProcess30Days] = React.useState(0);
+  const [totalEvents, setTotalEvents] = React.useState(0);
 
   async function monitora(rotina) {
     try {
@@ -143,7 +145,8 @@ export default function HomeScreen() {
 
   function getUrlBase() {
     if (__DEV__) {
-      return 'http://192.168.56.1:8001/';
+      return 'http://192.168.1.8:8000/';
+      return 'http://najadvweb.com/';
     }
 
     const url = String(auth.adv.url_base).replace(/\/+$/, '');
@@ -189,6 +192,9 @@ export default function HomeScreen() {
         // processos
         setTotalProcess(data.naj.processos.total);
         setTotalProcess30Days(data.naj.processos?.trinta_dias || 0);
+
+        // eventos
+        setTotalEvents(data.naj.eventos.total);
 
         // a pagor
         setToPayValue(data.naj.valor_pagar.finalizado);
@@ -321,65 +327,64 @@ export default function HomeScreen() {
     } catch (er) { }
   }
 
-  React.useEffect(() => {
-    if (auth.pesquisas.length > 0) {
-      setCurrentPesquisa(auth.pesquisas[0]);
-      setModalPesquisaVisibleNps(true);
-    } else {
-      setModalPesquisaVisibleNps(false);
-    }
-  }, [auth.pesquisas]);
+  	React.useEffect(() => {
+		setModalPesquisaVisibleNps(false);
+		if (auth.pesquisas.length > 0) {
+			setCurrentPesquisa(auth.pesquisas[0]);
+			setModalPesquisaVisibleNps(true);
+		}
+  	}, [auth.pesquisas]);
 
-  React.useEffect(() => {
-    if (currentPesquisa.id != -1) {
-      refreshVisualizacaoPesquisa();
-    }
-  }, [currentPesquisa]);
+	React.useEffect(() => {
+		if (currentPesquisa.id != -1) {
+			refreshVisualizacaoPesquisa();
+		}
+	}, [currentPesquisa]);
 
-  React.useEffect(() => {
-    if (isFocused && isSelectedAdv && auth?.dashboard?.chat_info?.id_chat) {
-      loadAllLogoFiles();
-      loadDashboard();
-      loadLogoFile();
-    } else {
-      setLoading(false);
-    }
-  }, [isFocused]);
+	React.useEffect(() => {
+		if (isFocused && isSelectedAdv && auth?.dashboard?.chat_info?.id_chat) {
+			loadAllLogoFiles();
+			loadDashboard();
+			loadLogoFile();
+		} else {
+			setLoading(false);
+		}
+	}, [isFocused]);
 
-  React.useEffect(() => {
-    if (isFocused && isSelectedAdv && auth?.dashboard?.chat_info?.id_chat) {
-      //loadDashboard();
-    }
+	React.useEffect(() => {
+		if (isFocused && isSelectedAdv && auth?.dashboard?.chat_info?.id_chat) {
+		//loadDashboard();
+		}
 
-    if (isFocused && isSelectedAdv && auth?.dashboard?.chat_info?.id_chat) {
-      loadDashboard();
-    }
-  }, [auth.dashboard]);
+		if (isFocused && isSelectedAdv && auth?.dashboard?.chat_info?.id_chat) {
+			loadDashboard();
+		}
+	}, [auth.dashboard]);
 
-  React.useEffect(() => {
-    // recarregar a logo
-    if (auth.adv?.codigo && logoFile.advCodigo !== auth.adv.codigo) {
-      //loadAllLogoFiles();
+	React.useEffect(() => {
+		// recarregar a logo
+		if (auth.adv?.codigo && logoFile.advCodigo !== auth.adv.codigo) {
+		//loadAllLogoFiles();
 
-      loadLogoFile();
-    }
+			loadLogoFile();
+		}
 
-    // veio da notificação
-    if (auth.adv?.codigo && hasChangedAdvByNotification) {
-      setHasChangedAdvByNotification(false);
-      handleNavigateChat();
-    }
-  }, [auth.adv]);
+		// veio da notificação
+		if (auth.adv?.codigo && hasChangedAdvByNotification) {
+			setHasChangedAdvByNotification(false);
+			handleNavigateChat();
+		}
+	}, [auth.adv]);
 
-  React.useEffect(() => {
-    if (auth.adv) {
-      setIsSelectedAdv(true);
+	React.useEffect(() => {
+		if (auth.adv) {
+			setIsSelectedAdv(true);
 
-      if (auth?.dashboard?.chat_info?.id_chat) {
-        loadDashboard(false);
-      }
-    }
-  }, [auth]);
+			if (auth?.dashboard?.chat_info?.id_chat) {
+				loadDashboard(false);
+			}
+		}
+	}, [auth]);
 
   React.useEffect(() => {
     dispatch(clearLastReceived());
@@ -407,6 +412,8 @@ export default function HomeScreen() {
       handleNavigateProcessActivities(processId);
     } else if (lastNotification?.lastAction === '@ACT/open_activities' && isSameAdv && isSameUser) { // abre a tabela de 'ATIVIDADES'
       handleNavigateActivities();
+    } else if (lastNotification?.lastAction === '@ACT/open_events' && isSameAdv && isSameUser) { // abre a tabela de 'AGENDAMENTOS'
+      handleNavigateAgenda();
     } else if (lastNotification?.lastAction === '@ACT/release_adv' && isSameUser) {
       handleNavigateAdvChoice();
     } else if (lastNotification?.lastAction === '@ACT/new_message' && isSameAdv && isSameUser) {
@@ -514,6 +521,26 @@ export default function HomeScreen() {
             {totalProcess30Days}
           </NajText>
         )}
+      </View>
+    );
+  }
+
+  function getBadgeEventContainer() {
+    return (
+      <View style={{ flexDirection: 'row' }}>
+        <NajText
+          style={{
+            backgroundColor: '#d00',
+              fontSize: 12,
+              color: '#fff',
+              textAlign: 'center',
+              paddingVertical: 2,
+              paddingHorizontal: 6,
+              borderRadius: 50,
+              fontWeight: 'bold',
+          }}>
+          {totalEvents}
+        </NajText>
       </View>
     );
   }
@@ -648,6 +675,7 @@ export default function HomeScreen() {
               if (auth.pesquisas.length == 1) {
                 setModalPesquisaVisibleNps(false);
                 setLoadingPergunta(false);
+				loadNextPesquisa();
                 return;
               }
 
@@ -658,48 +686,55 @@ export default function HomeScreen() {
           <View style={{ width: 15 }} />
           <View style={{ flex: 1 }}>
             <NajButton inModal={true} onPress={async () => {
-              // o cara respondeu
-              if (loadingPergunta) return;
+				// o cara respondeu
+				if (loadingPergunta) return;
 
-              setLoadingPergunta(true);
+				setLoadingPergunta(true);
 
-              let _pesquisas = [];
-              let newPesquisas = [];
+				let _pesquisas = [];
+				let newPesquisas = [];
 
-              try {
-                _pesquisas = await AsyncStorage.getItem(`@NAJ_AC/pesquisa_${auth.adv.codigo}`);
-                _pesquisas = JSON.parse(_pesquisas);
+				try {
+					_pesquisas = await AsyncStorage.getItem(`@NAJ_AC/pesquisa_${auth.adv.codigo}`);
+					_pesquisas = JSON.parse(_pesquisas);
 
-                if (_pesquisas && _pesquisas.find(({ id: pId }) => String(currentPesquisa.id) == String(pId))) {
-                  _pesquisas.forEach(p => {
-                    if (String(currentPesquisa.id) == String(p.id)) {
-                      newPesquisas.push({ ...p, respondido: 'S' });
-                    } else {
-                      newPesquisas.push(p);
-                    }
-                  });
-                } else {
-                  if (_pesquisas && _pesquisas.length > 0) {
-                    newPesquisas = _pesquisas;
-                  }
+					if (_pesquisas && _pesquisas.find(({ id: pId }) => String(currentPesquisa.id) == String(pId))) {
+						_pesquisas.forEach(p => {
+							if (String(currentPesquisa.id) == String(p.id)) {
+								newPesquisas.push({ ...p, respondido: 'S' });
+							} else {
+								newPesquisas.push(p);
+							}
+						});
+					} else {
+						if (_pesquisas && _pesquisas.length > 0) {
+							newPesquisas = _pesquisas;
+						}
 
-                  _pesquisas.push({ ...currentPesquisa, respondido: 'S' });
-                }
+						_pesquisas.push({ ...currentPesquisa, respondido: 'S' });
+					}
 
-                await AsyncStorage.setItem(`@NAJ_AC/pesquisa_${auth.adv.codigo}`, JSON.stringify(newPesquisas));
-              } catch (_e) { }
+					await AsyncStorage.setItem(`@NAJ_AC/pesquisa_${auth.adv.codigo}`, JSON.stringify(newPesquisas));
 
-              if (auth.pesquisas.length == 1) {
-                setModalPesquisaVisibleNps(false);
-                setLoadingPergunta(false);
-                return;
-              }
+					// requisição
+					try {
+						await ADVService.post(`/api/v1/app/pesquisas/aceito/${currentPesquisa.id}`, {
+							motivo: valueMotivoPesquisaNps,
+							nota: valuePesquisaNps
+						});
+					} catch (_err) { }
+				} catch (_e) { }
 
-              // requisição
+				if (auth.pesquisas.length == 1) {
+					setModalPesquisaVisibleNps(false);
+					setLoadingPergunta(false);
+					loadNextPesquisa();
+					return;
+				}
 
-              loadNextPesquisa();
-              setLoadingPergunta(false);
-            }}>Confirmar</NajButton>
+				loadNextPesquisa();
+				setLoadingPergunta(false);
+			}}>Confirmar</NajButton>
           </View>
         </View>
       </Modal>
@@ -865,12 +900,13 @@ export default function HomeScreen() {
     return (
       <>
         <View style={styles.headerTop}>
-          <RectButton
+          {/* <RectButton
             style={styles.headerIcon}
             onPress={handleNavigateAdvChoice}>
             <MaterialIcon size={28} color="#fff" name="swap-horiz" />
-          </RectButton>
-          <View style={{ flex: 1 }}>
+          </RectButton> */}
+          <View style={{ flex: 1, paddingHorizontal: 20 }}>
+            <MaterialCommunityIcon size={28} color="#fff" name="add" />
             <NajText style={styles.advName}>{getUserName()}</NajText>
           </View>
         </View>
@@ -896,11 +932,12 @@ export default function HomeScreen() {
         {getModalPesquisaNps()}
 
         <View style={styles.headerTop}>
-          <RectButton
+          {/* <RectButton
             style={styles.headerIcon}
             onPress={handleNavigateAdvChoice}>
             <MaterialIcon size={28} color="#fff" name="swap-horiz" />
-          </RectButton>
+          </RectButton> */}
+          <MaterialCommunityIcon style={styles.headerIcon} size={28} color="#fff" name="briefcase" />
           <View style={{ flex: 1 }}>
             <NajText style={styles.advName}>{auth.adv.nome}</NajText>
             <NajText style={styles.userName}>{getUserName()}</NajText>
@@ -966,7 +1003,7 @@ export default function HomeScreen() {
               title="Agendamentos"
               icon="calendar"
               onPress={handleNavigateAgenda}
-            //badges={[() => getBadgeContainer('1')]}
+            badges={[getBadgeEventContainer]}
             />
           </View>
 
