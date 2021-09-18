@@ -11,6 +11,7 @@ import {
   Modal,
   Dimensions,
   PermissionsAndroid,
+  ToastAndroid
 } from 'react-native';
 import Image from 'react-native-scalable-image';
 import Autolink from 'react-native-autolink';
@@ -169,7 +170,7 @@ export default function ChatScreen({ route, navigator }) {
     }
 
     if (err) {
-      Alert.alert('Erro', 'Houve um erro ao enviar a imagem');
+      ToastAndroid.show("Ops, houve um erro ao enviar a imagem!", ToastAndroid.SHORT)
 
       return;
     }
@@ -223,7 +224,7 @@ export default function ChatScreen({ route, navigator }) {
     }
 
     if (err) {
-      Alert.alert('Erro', 'Houve um erro ao enviar a mensagem');
+      ToastAndroid.show("Ops, houve um erro ao enviar a mensagem!", ToastAndroid.SHORT)
 
       return;
     }
@@ -255,7 +256,7 @@ export default function ChatScreen({ route, navigator }) {
     const sizeMb = (attachPick.response.size / 1024 / 1024).toFixed(1) * 1;
 
     if (sizeMb > 20) {
-      Alert.alert('Atenção', 'No momento não possível efetuar o envio de arquivos maiores que 20MB.');
+      ToastAndroid.show("No momento não possível efetuar o envio de arquivos maiores que 20MB.", ToastAndroid.SHORT)
       return;
     }
 
@@ -306,7 +307,7 @@ export default function ChatScreen({ route, navigator }) {
         message = 'O arquivo selecionado é muito grande';
       }
 
-      Alert.alert('Atenção', message);
+      ToastAndroid.show(message, ToastAndroid.SHORT)
       return;
     }
 
@@ -396,7 +397,7 @@ export default function ChatScreen({ route, navigator }) {
         chat_id: auth.dashboard.chat_info.id_chat,
       });
     } catch (err) {
-      Alert.alert('Erro', 'Houve um erro ao efetuar a requisição.');
+      ToastAndroid.show("Ops, houve um erro ao efetuar a requisição!", ToastAndroid.SHORT)
     }
   }
 
@@ -452,7 +453,7 @@ export default function ChatScreen({ route, navigator }) {
         setHasLoadedAll(true);
       }
     } catch (err) {
-      Alert.alert('Erro', 'Houve um erro ao efetuar a requisição.');
+      ToastAndroid.show("Ops, houve um erro ao efetuar a requisição!", ToastAndroid.SHORT)
     }
 
     setLoading(false);
@@ -485,10 +486,7 @@ export default function ChatScreen({ route, navigator }) {
 
       setChatFiles(files);
     } catch (err) {
-      Alert.alert(
-        'Ocorreu um erro',
-        'Não foi possível acessar os arquivos do dispositivo',
-      );
+      ToastAndroid.show("Não foi possível acessar os arquivos do dispositivo", ToastAndroid.SHORT)
     }
   }
 
@@ -503,10 +501,7 @@ export default function ChatScreen({ route, navigator }) {
     );
 
     if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-      Alert.alert(
-        'Atenção',
-        'O app não possui permissão para armazenamento de arquivos',
-      );
+      ToastAndroid.show("O app não possui permissão para armazenamento de arquivos", ToastAndroid.SHORT)
       return false;
     }
 
@@ -520,10 +515,7 @@ export default function ChatScreen({ route, navigator }) {
     );
 
     if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-      Alert.alert(
-        'Atenção',
-        'O app não possui permissão para gravação de áudio',
-      );
+      ToastAndroid.show("O app não possui permissão para gravação de áudio", ToastAndroid.SHORT)
       return false;
     }
 
@@ -666,7 +658,7 @@ export default function ChatScreen({ route, navigator }) {
             onPress={() => downloadFile(item)}>
             <View style={styles.attachWrapper}>
               <MaterialIcon size={28} name="image" color="#999" />
-              <NajText style={styles.attachText} numberOfLines={1}>
+              <NajText style={styles.attachText} numberOfLines={3}>
                 {item.file_origin_name}
               </NajText>
 
@@ -707,7 +699,7 @@ export default function ChatScreen({ route, navigator }) {
               <MaterialIcon size={28} name="insert-drive-file" color="#999" />
               <NajText
                 style={styles.attachText}
-                numberOfLines={1}
+                numberOfLines={3}
                 ellipsizeMode="middle">
                 {item.file_origin_name}
               </NajText>
@@ -726,7 +718,7 @@ export default function ChatScreen({ route, navigator }) {
             <MaterialIcon size={28} name="insert-drive-file" color="#999" />
             <NajText
               style={styles.attachText}
-              numberOfLines={1}
+              numberOfLines={3}
               ellipsizeMode="middle">
               {item.file_origin_name}
             </NajText>
@@ -807,7 +799,7 @@ export default function ChatScreen({ route, navigator }) {
 
     const sound = new Sound(filePath, null, error => {
       if (error) {
-        Alert.alert('Atenção', 'Ocorreu um erro ao executar o áudio');
+        ToastAndroid.show("Ocorreu um erro ao executar o áudio", ToastAndroid.SHORT)
         return;
       }
 
@@ -827,10 +819,7 @@ export default function ChatScreen({ route, navigator }) {
 
   async function downloadFile(item) {
     if (downloadInfo.loading) {
-      Alert.alert(
-        'Atenção',
-        'Não é possível efeutar o download de multiplos arquivos ao mesmo tempo',
-      );
+      ToastAndroid.show("Não é possível efeutar o download de multiplos arquivos ao mesmo tempo", ToastAndroid.SHORT)
       return;
     }
 
@@ -873,7 +862,7 @@ export default function ChatScreen({ route, navigator }) {
     }
 
     if (err) {
-      Alert.alert('Atenção', alertMessage);
+      ToastAndroid.show(alertMessage, ToastAndroid.SHORT)
     }
 
     setDownloadInfo({
@@ -887,7 +876,7 @@ export default function ChatScreen({ route, navigator }) {
     const file = chatFiles.find(it => it.name === _fileName);
 
     if (!file) {
-      Alert.alert('Atenção', 'Arquivo não encontrado');
+      ToastAndroid.show('Arquivo não encontrado', ToastAndroid.SHORT)
       return;
     }
 
@@ -1052,7 +1041,7 @@ export default function ChatScreen({ route, navigator }) {
           errorMessage = JSON.stringify(res.error);
         }
 
-        Alert.alert('Atenção', `Erro ao abrir a câmera. ${errorMessage}`);
+        ToastAndroid.show(`Erro ao abrir a câmera. ${errorMessage}`, ToastAndroid.SHORT)
       }
     });
   }
@@ -1160,7 +1149,7 @@ export default function ChatScreen({ route, navigator }) {
 
     const sound = new Sound(currentFile.path, null, error => {
       if (error) {
-        Alert.alert('Atenção', 'Ocorreu um erro ao executar o áudio');
+        ToastAndroid.show('Ocorreu um erro ao executar o áudio', ToastAndroid.SHORT)
         return;
       }
 
@@ -1257,7 +1246,7 @@ export default function ChatScreen({ route, navigator }) {
         message = 'O arquivo de áudio é muito grande';
       }
 
-      Alert.alert('Atenção', message);
+      ToastAndroid.show(message, ToastAndroid.SHORT)
 
       return;
     }
@@ -1287,10 +1276,7 @@ export default function ChatScreen({ route, navigator }) {
 
   function handlePressMic() {
     if (playing) {
-      Alert.alert(
-        'Atenção',
-        'Enquanto um áudio estiver sendo executado não é possível inciar essa ação',
-      );
+      ToastAndroid.show('Enquanto um áudio estiver sendo executado não é possível inciar essa ação', ToastAndroid.SHORT)
       return;
     }
 
@@ -1305,10 +1291,7 @@ export default function ChatScreen({ route, navigator }) {
 
   async function handlePressPickAttach() {
     if (playing) {
-      Alert.alert(
-        'Atenção',
-        'Enquanto um áudio estiver sendo executado não é possível inciar essa ação',
-      );
+      ToastAndroid.show('Enquanto um áudio estiver sendo executado não é possível inciar essa ação', ToastAndroid.SHORT)
       return;
     }
 
@@ -1340,7 +1323,7 @@ export default function ChatScreen({ route, navigator }) {
       if (DocumentPicker.isCancel(err)) {
         // cancelado
       } else {
-        Alert.alert('Atenção', 'Ocorreu um erro ao selecionar o arquivo');
+        ToastAndroid.show('Ocorreu um erro ao selecionar o arquivo', ToastAndroid.SHORT)
       }
     }
   }

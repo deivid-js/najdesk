@@ -5,6 +5,7 @@ import {
   Alert,
   RefreshControl,
   ActivityIndicator,
+  ToastAndroid
 } from 'react-native';
 import { useSelector } from 'react-redux';
 
@@ -192,7 +193,7 @@ export default function ToReceiveScreen({ values }) {
         setHasLoadedAll(true);
       }
     } catch (err) {
-      Alert.alert('Erro', 'Houve um erro ao efetuar a requisição.');
+      ToastAndroid.show('Ops, houve um erro ao efetuar a requisição', ToastAndroid.SHORT)
     }
 
     setLoading(false);

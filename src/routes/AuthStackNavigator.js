@@ -17,6 +17,7 @@ import AgendaScreen from '../screens/AgendaScreen';
 import AgendamentosScreen from '../screens/AgendamentosScreen';
 import NewEventScreen from '../screens/NewEventScreen';
 import AttachmentProcessListScreen from '../screens/AttachmentProcessListScreen';
+import AttachmentActivitiesListScreen from '../screens/AttachmentActivitiesListScreen';
 import NotificationListScreen from '../screens/NotificationListScreen';
 import ChatScreen from '../screens/ChatScreen';
 import ActiveProcessesScreen from '../screens/ActiveProcessesScreen';
@@ -271,6 +272,14 @@ export default function AuthStackNavigator() {
         options={{
           ...defaultOptions,
           title: 'anexos do processo',
+        }}
+      />
+      <Stack.Screen
+        name="AttachmentActivitiesList"
+        component={AttachmentActivitiesListScreen}
+        options={{
+          ...defaultOptions,
+          title: 'anexos da atividade',
         }}
       />
     </Stack.Navigator>

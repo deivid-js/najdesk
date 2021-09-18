@@ -1,5 +1,5 @@
 import React from 'react';
-import {Alert, RefreshControl, View, ActivityIndicator} from 'react-native';
+import {Alert, RefreshControl, View, ActivityIndicator, ToastAndroid} from 'react-native';
 
 import ADVService from '../services/adv';
 
@@ -50,7 +50,7 @@ export default function CompletedProcessesScreen() {
         setHasLoadedAll(true);
       }
     } catch (err) {
-      Alert.alert('Erro', 'Houve um erro ao efetuar a requisição.');
+      ToastAndroid.show('Ops, houve um erro ao efetuar a requisição.', ToastAndroid.SHORT)
     }
 
     setLoading(false);

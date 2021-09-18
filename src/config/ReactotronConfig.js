@@ -7,7 +7,7 @@ if (__DEV__) {
   console.log('*** reactotron');
 
   const tron = Reactotron.setAsyncStorageHandler(AsyncStorage)
-    .configure({ host: '192.168.56.1' })
+    .configure({ host: '192.168.1.9' })
     .useReactNative()
     .use(reactotronRedux())
     .use(reactotronSaga())

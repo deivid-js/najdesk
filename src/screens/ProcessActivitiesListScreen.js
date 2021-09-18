@@ -5,6 +5,7 @@ import {
   View,
   FlatList,
   StyleSheet,
+  ToastAndroid
 } from 'react-native';
 import { encode } from 'base-64';
 import moment from 'moment';
@@ -87,8 +88,8 @@ export default function ProcessActivitiesListScreen({ route }) {
       if (data.resultado.length < 50) {
         setHasLoadedAll(true);
       }
-    } catch (err) {
-      Alert.alert('Erro', 'Houve um erro ao efetuar a requisição.');
+    } catch (err) {      
+      ToastAndroid.show('Ops, houve um erro ao efetuar a requisição', ToastAndroid.SHORT)
     }
 
     setLoading(false);

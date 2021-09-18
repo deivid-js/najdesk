@@ -4,7 +4,7 @@ import { colors, metrics } from '../globals';
 import { useNavigation } from '@react-navigation/native';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, ToastAndroid } from 'react-native';
 
 import * as Animatable from 'react-native-animatable';
 
@@ -93,7 +93,7 @@ export default function EventCard() {
 			setData(newResultado);
 			setHasLoadedAll(true);
 		} catch (err) {
-			Alert.alert('Erro', 'Ops, não foi possível buscar os eventos, tente novamente mais tarde.');
+			ToastAndroid.show("Ops, não foi possível buscar os eventos, tente novamente mais tarde.", ToastAndroid.SHORT)
 		}
 
 		setLoading(false);

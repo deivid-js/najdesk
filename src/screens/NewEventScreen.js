@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Alert, ActivityIndicator, ScrollView } from 'react-native';
+import { View, Alert, ActivityIndicator, ScrollView, ToastAndroid } from 'react-native';
 import { useSelector } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
 
@@ -94,7 +94,7 @@ export default function NewEventScreen() {
 
     async function sendMessageText(message) {
         if (!chatId || chatId < 0) {
-            Alert.alert('Erro', 'Chat não encontrado');
+            ToastAndroid.show('Chat não encontrado', ToastAndroid.SHORT)
 
             return false;
         }
@@ -105,28 +105,28 @@ export default function NewEventScreen() {
         setLoading(true);
 
         try {
-        const response = await ADVService.post('/api/v1/app/chat/mensagens', {
-            conteudo: message,
-            chat_id: chatId,
-            tipo: '0',
-            file_type: '0',
-        });
+            const response = await ADVService.post('/api/v1/app/chat/mensagens', {
+                conteudo: message,
+                chat_id: chatId,
+                tipo: '0',
+                file_type: '0',
+            });
 
-        if (String(response.data.status_code) !== '200') {
+            if (String(response.data.status_code) !== '200') {
+                err = true;
+            }
+
+            persisted = response.data.naj.persisted;
+            } catch (errMsg) {
             err = true;
-        }
-
-        persisted = response.data.naj.persisted;
-        } catch (errMsg) {
-        err = true;
         }
 
         setLoading(false);
 
         if (err) {
-        Alert.alert('Erro', 'Houve um erro ao enviar a mensagem');
+            ToastAndroid.show('Ops, houve um erro ao enviar a mensagem', ToastAndroid.SHORT)
 
-        return false;
+            return false;
         }
 
         return true;

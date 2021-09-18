@@ -47,6 +47,7 @@ const styles = StyleSheet.create({
     padding: 15,
     paddingRight: 10,
     borderRadius: 10,
+    marginTop: -7
   },
   advName: {
     color: '#fff',

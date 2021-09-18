@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   Modal,
   TouchableOpacity,
+  ToastAndroid
 } from 'react-native';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import {RectButton} from 'react-native-gesture-handler';
@@ -75,7 +76,7 @@ export default function AttendanceScreen() {
         setHasLoadedAll(true);
       }
     } catch (err) {
-      Alert.alert('Erro', 'Houve um erro ao efetuar a requisição.');
+      ToastAndroid.show("Ops, não foi possível buscar os dados!", ToastAndroid.SHORT)
     }
 
     setLoading(false);
@@ -243,7 +244,7 @@ export default function AttendanceScreen() {
       return;
     }
 
-    Alert.alert('Ocorreu um erro', errorMessage);
+    ToastAndroid.show(errorMessage, ToastAndroid.SHORT)
   }
 
   React.useEffect(() => {

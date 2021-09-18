@@ -34,7 +34,7 @@ import { colors } from '../globals';
 
 const AnimatedBtn = Animatable.createAnimatableComponent(TouchableOpacity)
 
-export default function AttachmentProcessListScreen({ route }) {
+export default function AttachmentActivititesListScreen({ route }) {
     const { id } = route.params;
 
     const auth = useSelector(state => state.auth);
@@ -46,6 +46,7 @@ export default function AttachmentProcessListScreen({ route }) {
     const [currentUriImage, setCurrentUriImage] = React.useState(null);
     const [currentImageWidth, setCurrentImageWidth] = React.useState(null);
     const [currentImageHeight, setCurrentImageHeight] = React.useState(null);
+    const [codigoAtividade, setCodigoAtividade] = React.useState(null);
 
     const [downloadInfo, setDownloadInfo] = React.useState({
         loading: false,
@@ -60,9 +61,8 @@ export default function AttachmentProcessListScreen({ route }) {
     }
 
     async function handleDownload(item) {
-        if (downloadInfo.loading) {
+        if (downloadInfo.loading)
             return ToastAndroid.show("Não é possível efeutar o download de multiplos arquivos ao mesmo tempo!", ToastAndroid.SHORT)
-        }
 
         setDownloadInfo({
             loading: true,
@@ -84,7 +84,7 @@ export default function AttachmentProcessListScreen({ route }) {
             // console.tron.log(itemFile);
 
             if (!itemFile) {// Verifica se já não baixou
-                const res = await ADVService.post('/api/v1/app/processos/attachment/download', {
+                const res = await ADVService.post('/api/v1/app/atividades/attachment/download', {
                     adv_id: auth.adv.codigo,
                     anexo_id: item.ID,
                 });
@@ -155,7 +155,7 @@ export default function AttachmentProcessListScreen({ route }) {
 
         try {
             const { data } = await ADVService.get(
-                `/api/v1/app/processos/${key}/attachment`,
+                `/api/v1/app/atividades/${key}/attachment`,
             );
 
             setAttachments(data.resultado);
@@ -171,6 +171,8 @@ export default function AttachmentProcessListScreen({ route }) {
     }
 
     function handleRenderItem({ item }) {
+        console.tron.log(item);
+        setCodigoAtividade(item.CODIGO_ATIVIDADE)
         return (
             <View style={styles.item}>
                 <View>
@@ -188,9 +190,7 @@ export default function AttachmentProcessListScreen({ route }) {
                 </View>
                 <View style={styles.rowItem}>
                     <NajText style={styles.nonInfoText}>Nome Arquivo</NajText>
-                    <NajText
-                        numberOfLines={1}
-                        style={[styles.name, { paddingRight: 10 }]}>
+                    <NajText numberOfLines={1} style={{ paddingVertical: 5 }}>
                         {item.NOME_ARQUIVO}
                     </NajText>
                 </View>
@@ -228,6 +228,25 @@ export default function AttachmentProcessListScreen({ route }) {
 
     return (
         <NajContainer style={styles.container}>
+            <View
+              style={{
+                flexDirection: 'row',
+                borderBottomWidth: 1,
+                borderColor: '#f1f1f1',
+                backgroundColor: '#fff',
+                padding: 15,
+              }}>
+              <NajText
+                style={{
+                  fontWeight: 'bold',
+                  textTransform: 'uppercase',
+                  fontSize: 14,
+                }}>
+                Atividade :{ codigoAtividade }
+              </NajText>
+              {/* <NajText>{atividade}</NajText> */}
+            </View>
+
             {downloadInfo.loading && (
                 <View style={styles.audioCounterContainer}>
                     <View style={{ flex: 1, paddingRight: 15 }}>
@@ -371,5 +390,9 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
+    },
+    attachText: {
+        color: '#666',
+        flex: 1,
     },
 });

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Alert, View, ActivityIndicator, Modal, TextInput } from 'react-native';
+import { Alert, View, ActivityIndicator, Modal, TextInput, ToastAndroid } from 'react-native';
 import { RectButton, ScrollView } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
@@ -12,6 +12,8 @@ import * as RNFS from 'react-native-fs';
 import Slider from "react-native-slider";
 import moment from 'moment';
 import AsyncStorage from '@react-native-community/async-storage';
+
+
 
 import ADVService from '../services/adv';
 import CPanelService from '../services/cpanel';
@@ -38,301 +40,305 @@ import NajButton from '../components/NajButton';
 const defaultAdvLogo = require('../assets/images/advlogo.png');
 
 export default function HomeScreen() {
-  const dispatch = useDispatch();
-  const navigation = useNavigation();
-  const auth = useSelector(state => state.auth);
-  const lastNotification = useSelector(state => state.notification);
-  const isFocused = useIsFocused();
+	const dispatch = useDispatch();
+	const navigation = useNavigation();
+	const auth = useSelector(state => state.auth);
+	const lastNotification = useSelector(state => state.notification);
+	const isFocused = useIsFocused();
 
-  const [modalPesquisaVisibleNps, setModalPesquisaVisibleNps] = React.useState(false);
-  const [loadingPergunta, setLoadingPergunta] = React.useState(false);
-  const [valuePesquisaNps, setValuePesquisaNps] = React.useState(0);
-  const [valueMotivoPesquisaNps, setValueMotivoPesquisaNps] = React.useState('');
-  const [pesquisas, setPesquisas] = React.useState([]);
-  const [currentPesquisa, setCurrentPesquisa] = React.useState({
-    id: -1,
-    pergunta: '',
-    range_max: 10,
-    range_min_info: '',
-    range_max_info: '',
-  });
-  const [advLogo, setAdvLogo] = React.useState(false);
-  const [allLogos, setAllLogos] = React.useState([]);
-  const [logoFile, setLogoFile] = React.useState({ exists: false, file: null, loading: true });
-  const [toPayValue, setToPayValue] = React.useState(0);
-  const [toPayValueFinished, setToPayValueFinished] = React.useState(0);
-  const [toReceiveValue, setToReceiveValue] = React.useState(0);
-  const [homeInfo, setHomeInfo] = React.useState({});
-  const [toReceiveValueFinished, setToReceiveValueFinished] = React.useState(0);
-  const [isSelectedAdv, setIsSelectedAdv] = React.useState(false);
-  const [loadChatAnimation, setLoadChatAnimation] = React.useState(false);
-  const [isFistTimeLoadingThis, setIsFistTimeLoadingThis] = React.useState(
-    true,
-  );
-  const [loading, setLoading] = React.useState(true);
-  const [hasChangedAdvByNotification, setHasChangedAdvByNotification] = React.useState(false);
+	const [modalPesquisaVisibleNps, setModalPesquisaVisibleNps] = React.useState(false);
+	const [loadingPergunta, setLoadingPergunta] = React.useState(false);
+	const [valuePesquisaNps, setValuePesquisaNps] = React.useState(0);
+	const [valueMotivoPesquisaNps, setValueMotivoPesquisaNps] = React.useState('');
+	const [pesquisas, setPesquisas] = React.useState([]);
+	const [currentPesquisa, setCurrentPesquisa] = React.useState({
+		id: -1,
+		pergunta: '',
+		range_max: 10,
+		range_min_info: '',
+		range_max_info: '',
+	});
+	const [advLogo, setAdvLogo] = React.useState(false);
+	const [allLogos, setAllLogos] = React.useState([]);
+	const [logoFile, setLogoFile] = React.useState({ exists: false, file: null, loading: true });
+	const [toPayValue, setToPayValue] = React.useState(0);
+	const [toPayValueFinished, setToPayValueFinished] = React.useState(0);
+	const [toReceiveValue, setToReceiveValue] = React.useState(0);
+	const [homeInfo, setHomeInfo] = React.useState({});
+	const [toReceiveValueFinished, setToReceiveValueFinished] = React.useState(0);
+	const [isSelectedAdv, setIsSelectedAdv] = React.useState(false);
+	const [loadChatAnimation, setLoadChatAnimation] = React.useState(false);
+	const [isFistTimeLoadingThis, setIsFistTimeLoadingThis] = React.useState(
+		true,
+	);
+	const [loading, setLoading] = React.useState(true);
+	const [hasChangedAdvByNotification, setHasChangedAdvByNotification] = React.useState(false);
 
-  // badges
-  const [notReadMessages, setNotReadMessages] = React.useState(0);
-  const [readMessages, setReadMessages] = React.useState(0);
-  const [totalAtivities, setTotalAtivities] = React.useState(0);
-  const [monthAtivities, setMonthAtivities] = React.useState(0);
-  const [totalProcess, setTotalProcess] = React.useState(0);
-  const [totalProcess30Days, setTotalProcess30Days] = React.useState(0);
-  const [totalEvents, setTotalEvents] = React.useState(0);
+	// badges
+	const [notReadMessages, setNotReadMessages] = React.useState(0);
+	const [readMessages, setReadMessages] = React.useState(0);
+	const [totalAtivities, setTotalAtivities] = React.useState(0);
+	const [monthAtivities, setMonthAtivities] = React.useState(0);
+	const [totalProcess, setTotalProcess] = React.useState(0);
+	const [totalProcess30Days, setTotalProcess30Days] = React.useState(0);
+	const [totalEvents, setTotalEvents] = React.useState(0);
 
-  async function monitora(rotina) {
-    try {
-      await ADVService.get(`/api/v1/app/${rotina}/monitora`);
-    } catch (err) { }
-  }
+	async function monitora(rotina) {
+		try {
+			await ADVService.get(`/api/v1/app/${rotina}/monitora`);
+		} catch (err) { }
+	}
 
-  function handleNavigateAdvChoice() {
-    navigation.navigate('AdvChoiceScreen');
-  }
+	function handleNavigateAdvChoice() {
+		navigation.navigate('AdvChoiceScreen');
+	}
 
-  function handleNavigateChat() {
-    monitora('chat');
+	function handleNavigateChat() {
+		monitora('chat');
 
-    navigation.navigate('Chat');
-  }
+		navigation.navigate('Chat');
+	}
 
-  function handleNavigateFinance(screenName) {
-    monitora('financeiro');
+	function handleNavigateFinance(screenName) {
+		monitora('financeiro');
 
-    const values = {
-      toPayValue,
-      toPayValueFinished,
-      toReceiveValue,
-      toReceiveValueFinished,
-    };
+		const values = {
+			toPayValue,
+			toPayValueFinished,
+			toReceiveValue,
+			toReceiveValueFinished,
+		};
 
-    navigation.navigate('Finance', { screen: screenName, values });
-  }
+		navigation.navigate('Finance', { screen: screenName, values });
+	}
 
-  function handleNavigateAgenda() {
-    monitora('agenda');
+	function handleNavigateAgenda() {
+		monitora('agenda');
 
-    navigation.navigate('Agenda');
-  }
+		navigation.navigate('Agenda');
+	}
 
-  function handleNavigateActivities() {
-    monitora('atividades');
+	function handleNavigateActivities() {
+		monitora('atividades');
 
-    navigation.navigate('Activities');
-  }
+		navigation.navigate('Activities');
+	}
 
-  function handleNavigateAttendance() {
-    monitora('chat');
+	function handleNavigateAttendance() {
+		monitora('chat');
 
-    setNotReadMessages(0);
-    navigation.navigate('Chat');
-  }
+		setNotReadMessages(0);
+		navigation.navigate('Chat');
+	}
 
-  function handleNavigateProcess() {
-    monitora('processos');
+	function handleNavigateProcess() {
+		monitora('processos');
 
-    navigation.navigate('Process');
-  }
+		navigation.navigate('Process');
+	}
 
-  function getUserName() {
-    if (auth.user?.apelido && auth.user.apelido) {
-      return auth.user.apelido;
-    }
+	function getUserName() {
+		if (auth.user?.apelido && auth.user.apelido) {
+			return auth.user.apelido;
+		}
 
-    return auth.user.nome;
-  }
+		return auth.user.nome;
+	}
 
-  function getUrlBase() {
-    if (__DEV__) {
-      return 'http://192.168.1.8:8000/';
-      return 'http://najadvweb.com/';
-    }
+	function getUrlBase() {
+		if (__DEV__) {
+			return 'http://192.168.1.9:8000/';
+			return 'http://najadvweb.com/';
+		}
 
-    const url = String(auth.adv.url_base).replace(/\/+$/, '');
-    let ext = '/naj-adv-web/public/';
+		const url = String(auth.adv.url_base).replace(/\/+$/, '');
+		let ext = '/naj-adv-web/public/';
 
-    if (url.indexOf('naj-adv-web/public') > -1) {
-      ext = '/';
-    }
+		if (url.indexOf('naj-adv-web/public') > -1) {
+			ext = '/';
+		}
 
-    return url + ext;
-  }
+		return url + ext;
+	}
 
-  async function loadDashboard(useDefault = true) {
-    let hasError = false;
-    let errorMessage = '';
-    let ext = '';
+	async function loadDashboard(useDefault = true) {
+		let hasError = false;
+		let errorMessage = '';
+		let ext = '';
 
-    try {
-      const _urlBase = useDefault ? '' : getUrlBase();
-      const deviceData = await getUserInfo();
+		try {
+			const _urlBase = useDefault ? '' : getUrlBase();
+			const deviceData = await getUserInfo();
 
-      const res = await ADVService.post(`${_urlBase}api/v1/app/home`, {
-        chat_id: auth.dashboard.chat_info.id_chat,
-        device: deviceData,
-      });
+			const res = await ADVService.post(`${_urlBase}api/v1/app/home`, {
+				chat_id: auth.dashboard.chat_info.id_chat,
+				device: deviceData,
+			});
 
-      const { data } = res;
+			const { data } = res;
 
-      if (String(data.status_code) !== '200') {
-        errorMessage = data?.naj?.mensagem || '';
-        hasError = true;
-      } else {
-        const primeiro_acesso = String(data.naj.primeiro_acesso) === '1';
+			if (String(data.status_code) !== '200') {
+				errorMessage = data?.naj?.mensagem || '';
+				hasError = true;
+			} else {
+				const primeiro_acesso = String(data.naj.primeiro_acesso) === '1';
 
-        // mensagens
-        setNotReadMessages(data.naj.mensagens.nao_lidas);
-        setReadMessages(data.naj.mensagens.total);
+				// mensagens
+				setNotReadMessages(data.naj.mensagens.nao_lidas);
+				setReadMessages(data.naj.mensagens.total);
 
-        // atividades
-        setTotalAtivities(data.naj.atividades.total);
-        setMonthAtivities(data.naj.atividades.mes_atual);
+				// atividades
+				setTotalAtivities(data.naj.atividades.total);
+				setMonthAtivities(data.naj.atividades.mes_atual);
 
-        // processos
-        setTotalProcess(data.naj.processos.total);
-        setTotalProcess30Days(data.naj.processos?.trinta_dias || 0);
+				// processos
+				setTotalProcess(data.naj.processos.total);
+				setTotalProcess30Days(data.naj.processos?.trinta_dias || 0);
 
-        // eventos
-        setTotalEvents(data.naj.eventos.total);
+				// eventos
+				setTotalEvents(data.naj.eventos.total);
 
-        // a pagor
-        setToPayValue(data.naj.valor_pagar.finalizado);
-        setToPayValueFinished(data.naj.valor_pagar.aberto);
+				// a pagor
+				setToPayValue(data.naj.valor_pagar.finalizado);
+				setToPayValueFinished(data.naj.valor_pagar.aberto);
 
-        // a receber
-        setToReceiveValue(data.naj.valor_receber.finalizado);
-        setToReceiveValueFinished(data.naj.valor_receber.aberto);
+				// a receber
+				setToReceiveValue(data.naj.valor_receber.finalizado);
+				setToReceiveValueFinished(data.naj.valor_receber.aberto);
 
-        // resto
-        setHomeInfo({ ...homeInfo, primeiro_acesso });
+				// resto
+				setHomeInfo({ ...homeInfo, primeiro_acesso });
 
-        // animação...
-        if (data.naj.mensagens.total == 0 && data.naj.atividades.total == 0 && data.naj.processos.total == 0) {
-          setLoadChatAnimation(true);
-        } else {
-          setLoadChatAnimation(false);
-        }
-      }
-    } catch (err) {
-      hasError = true;
+				// animação...
+				if (data.naj.mensagens.total == 0 && data.naj.atividades.total == 0 && data.naj.processos.total == 0) {
+					setLoadChatAnimation(true);
+				} else {
+					setLoadChatAnimation(false);
+				}
+			}
+		} catch (err) {
+			hasError = true;
 
-      if (__DEV__) {
-        ext = err.message;
-      }
-    }
+			if (__DEV__) {
+				ext = err.message;
+			}
+		}
 
-    if (hasError) {
-      if (errorMessage != 'desativado') {
-        Alert.alert('Atenção', 'Houve um erro ao executar a requisição.');
-      } else {
-        Alert.alert('Atenção', 'Esse dispositivo está desativado.', [
-          { text: 'OK', onPress: () => dispatch(signOut()) }
-        ]);
-      }
-    }
+		if (hasError) {
+			if (errorMessage != 'desativado') {
+				ToastAndroid.show("Ops, não foi possível buscar os dados!", ToastAndroid.SHORT)
+			// Alert.alert('Atenção', 'Houve um erro ao executar a requisição.');
+			} else {
+				Alert.alert('Atenção', 'Esse dispositivo está desativado.', [
+				{ text: 'OK', onPress: () => dispatch(signOut()) }
+				]);
+			}
+		}
 
-    setLoading(false);
-  }
+		setLoading(false);
+	}
 
-  function getAdvLogo() {
-    if (logoFile.exists) {
-      const currentLogo = allLogos.find(_logo => _logo.advCodigo == auth.adv.codigo);
+	function getAdvLogo() {
+		if (logoFile.exists) {
+			const currentLogo = allLogos.find(_logo => _logo.advCodigo == auth.adv.codigo);
 
-      if (currentLogo) {
-        return (
-          <View style={styles.advLogoContainer}>
-            <Image
-              source={{ uri: currentLogo.path }}
-              style={styles.advLogo}
-              width={getWidthPerCent(50)}
-            />
-          </View>
-        );
-      }
-    }
+			if (currentLogo) {
+				return (
+				<View style={styles.advLogoContainer}>
+					<Image
+					source={{ uri: currentLogo.path }}
+					style={styles.advLogo}
+					width={getWidthPerCent(50)}
+					/>
+				</View>
+				);
+			}
+		}
 
-    return (
-      <View style={styles.advLogoContainer}>
-        <Image
-          source={defaultAdvLogo}
-          style={styles.advLogo}
-          width={getWidthPerCent(50)}
-        />
-      </View>
-    );
-  }
+		return (
+			<View style={styles.advLogoContainer}>
+				<Image
+				source={defaultAdvLogo}
+				style={styles.advLogo}
+				width={getWidthPerCent(50)}
+				/>
+			</View>
+		);
+	}
 
-  async function loadAllLogoFiles() {
-    const advFolders = await RNFS.readDir(`${RNFS.DocumentDirectoryPath}/logos`);
+	async function loadAllLogoFiles() {
+		const advFolders = await RNFS.readDir(`${RNFS.DocumentDirectoryPath}/logos`);
 
-    const advLogoFiles = [];
+		const advLogoFiles = [];
 
-    for (let i = 0; i < advFolders.length; i++) {
-      const advLogoFolder = await RNFS.readDir(advFolders[i].path);
+		for (let i = 0; i < advFolders.length; i++) {
+			const advLogoFolder = await RNFS.readDir(advFolders[i].path);
 
-      if (advLogoFolder.length > 0) {
-        advLogoFiles.push({ advCodigo: advFolders[i].name, path: `file://${advLogoFolder[0].path}` });
-      }
-    };
+			if (advLogoFolder.length > 0) {
+				advLogoFiles.push({ advCodigo: advFolders[i].name, path: `file://${advLogoFolder[0].path}` });
+			}
+		};
 
-    setAllLogos(advLogoFiles);
+		setAllLogos(advLogoFiles);
 
-    /*console.tron.log('*** loadAllLogoFiles');
-    console.tron.log(advLogoFiles);*/
+		/*console.tron.log('*** loadAllLogoFiles');
+		console.tron.log(advLogoFiles);*/
 
-    return advLogoFiles;
-  }
+		return advLogoFiles;
+	}
 
-  async function loadLogoFile(data = false) {
-    let _allLogos = allLogos;
+	async function loadLogoFile(data = false) {
+		let _allLogos = allLogos;
 
-    if (_allLogos == 0) {
-      _allLogos = await loadAllLogoFiles();
-    }
+		if (_allLogos == 0) {
+			_allLogos = await loadAllLogoFiles();
+		}
 
-    const _adv = data ? data : auth.adv;
+		const _adv = data ? data : auth.adv;
 
-    if (!_adv) {
-      setLogoFile({ exists: false, loading: true });
-      return;
-    }
-    const existe = _allLogos.find(_logo => _logo.advCodigo == _adv.codigo);
+		if (!_adv) {
+			setLogoFile({ exists: false, loading: true });
+			return;
+		}
+		const existe = _allLogos.find(_logo => _logo.advCodigo == _adv.codigo);
 
-    if (!existe) {
-      setLogoFile({ exists: false, loading: false });
-      return;
-    }
+		if (!existe) {
+			setLogoFile({ exists: false, loading: false });
+			return;
+		}
 
-    setLogoFile({ exists: true });
-  }
+		setLogoFile({ exists: true });
+	}
 
-  function handleNavigateToPay() {
-    handleNavigateFinance('ToPay');
-  }
+	function handleNavigateToPay() {
+		handleNavigateFinance('ToPay');
+	}
 
-  function handleNavigateToReceive() {
-    handleNavigateFinance('ToReceive');
-  }
+	function handleNavigateToReceive() {
+		handleNavigateFinance('ToReceive');
+	}
 
-  function handleNavigateProcessActivities(processId) {
-    monitora('processos');
+	function handleNavigateProcessActivities(processId) {
+		monitora('processos');
 
-    navigation.navigate('ProcessActivitiesList', { id: processId });
-  }
+		navigation.navigate('ProcessActivitiesList', { id: processId });
+	}
 
-  async function refreshVisualizacaoPesquisa() {
-    try {
-      await ADVService.get(`/api/v1/app/pesquisas/refresh/${currentPesquisa.id}`);
-    } catch (er) { }
-  }
+	async function refreshVisualizacaoPesquisa() {
+		try {
+			await ADVService.get(`/api/v1/app/pesquisas/refresh/${currentPesquisa.id}`);
+		} catch (er) { }
+	}
 
   	React.useEffect(() => {
-		setModalPesquisaVisibleNps(false);
-		if (auth.pesquisas.length > 0) {
-			setCurrentPesquisa(auth.pesquisas[0]);
-			setModalPesquisaVisibleNps(true);
-		}
+		setTimeout(() => {
+			if (auth.pesquisas.length > 0) {
+				setCurrentPesquisa(auth.pesquisas[0]);
+				setModalPesquisaVisibleNps(true);
+			} else {
+				setModalPesquisaVisibleNps(false);
+			}
+		}, 3500)
   	}, [auth.pesquisas]);
 
 	React.useEffect(() => {
@@ -440,7 +446,7 @@ export default function HomeScreen() {
     if (lastNotification?.lastAction && auth?.user?.id && acts.indexOf(lastNotification.lastAction) > -1 && !isSameUser) {
       const { message } = lastNotification.lastReceived;
       //Alert.alert('Atenção', `Esta mensagem foi enviada para: ${message.apelido || message.nome}.`);
-      Alert.alert('Atenção', 'Esta mensagem foi enviada para outra pessoa que utiliza este mesmo dispositivo!');
+      ToastAndroid.show('Esta mensagem foi enviada para outra pessoa que utiliza este mesmo dispositivo!', ToastAndroid.SHORT)
     }
   }, [lastNotification]);
 
@@ -814,10 +820,7 @@ export default function HomeScreen() {
         };
       });
     } catch (err) {
-      Alert.alert(
-        'Atenção',
-        'Houve um erro ao carregar a listagem de prestadores de serviço',
-      );
+      ToastAndroid.show('Houve um erro ao carregar a listagem de prestadores de serviço', ToastAndroid.SHORT)
     }
 
     setIsFistTimeLoadingThis(false);
@@ -931,17 +934,15 @@ export default function HomeScreen() {
       <>
         {getModalPesquisaNps()}
 
-        <View style={styles.headerTop}>
-          {/* <RectButton
-            style={styles.headerIcon}
-            onPress={handleNavigateAdvChoice}>
-            <MaterialIcon size={28} color="#fff" name="swap-horiz" />
-          </RectButton> */}
-          <MaterialCommunityIcon style={styles.headerIcon} size={28} color="#fff" name="briefcase" />
-          <View style={{ flex: 1 }}>
-            <NajText style={styles.advName}>{auth.adv.nome}</NajText>
-            <NajText style={styles.userName}>{getUserName()}</NajText>
-          </View>
+        <View style={styles.headerTop}>            
+            <View style={{ flex: 1, marginHorizontal: 15}}>
+              <NajText style={styles.advName}>
+                <MaterialCommunityIcon style={styles.headerIcon} size={20} color="#fff" name="briefcase" />  {auth.adv.nome}
+              </NajText>
+              <NajText style={styles.userName}>
+                <MaterialCommunityIcon size={22} color="#fff" name="account" />  {getUserName()}
+              </NajText>
+            </View>
         </View>
 
         {getAdvLogo()}
