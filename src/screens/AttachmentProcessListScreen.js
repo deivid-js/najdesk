@@ -47,6 +47,8 @@ export default function AttachmentProcessListScreen({ route }) {
     const [currentImageWidth, setCurrentImageWidth] = React.useState(null);
     const [currentImageHeight, setCurrentImageHeight] = React.useState(null);
 
+    const [selectedId, setSelectedId] = React.useState(null);
+
     const [downloadInfo, setDownloadInfo] = React.useState({
         loading: false,
         name: '',
@@ -68,6 +70,8 @@ export default function AttachmentProcessListScreen({ route }) {
             loading: true,
             name: item.NOME_ARQUIVO,
         });
+
+        setSelectedId(item.ID)
 
         let err = false;
         let alertMessage = 'Houve um erro ao efetuar o download do arquivo';
@@ -171,8 +175,10 @@ export default function AttachmentProcessListScreen({ route }) {
     }
 
     function handleRenderItem({ item }) {
+        let backgroundColor = item.ID === selectedId ? "#f1f1f1" : "#fff";
+
         return (
-            <View style={styles.item}>
+            <View style={{ backgroundColor: backgroundColor, paddingVertical: 5, paddingHorizontal: 10, flexDirection: 'row', }}>
                 <View>
                     <TouchableOpacity
                         activeOpacity={0.7}
@@ -253,6 +259,7 @@ export default function AttachmentProcessListScreen({ route }) {
                 ItemSeparatorComponent={() => <View style={styles.separator} />}
                 keyExtractor={({ ID }) => String(ID)}
                 renderItem={handleRenderItem}
+                extraData={selectedId}
                 onEndReachedThreshold={0.5}
             />
 

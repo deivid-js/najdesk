@@ -302,7 +302,7 @@ export default function EventCard() {
 				// ItemSeparatorComponent={getItemSeparatorComponent}
 				// onEndReachedThreshold={0.5}
 				// ListFooterComponent={handleRenderFooter}
-				// initialNumToRender={10}
+				initialNumToRender={20}
 				ListEmptyComponent={() => (
 					<EmptyList text="Nenhum evento foi encontrado" />
 				)}

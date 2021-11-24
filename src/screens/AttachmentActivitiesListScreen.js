@@ -22,8 +22,6 @@ import ImageZoom from 'react-native-image-pan-zoom';
 import Image from 'react-native-scalable-image';
 
 import * as RNFS from 'react-native-fs';
-import * as Animatable from 'react-native-animatable';
-
 
 import ADVService from '../services/adv';
 
@@ -31,8 +29,6 @@ import ADVService from '../services/adv';
 import NajContainer from '../components/NajContainer';
 import NajText from '../components/NajText';
 import { colors } from '../globals';
-
-const AnimatedBtn = Animatable.createAnimatableComponent(TouchableOpacity)
 
 export default function AttachmentActivititesListScreen({ route }) {
     const { id } = route.params;
@@ -47,6 +43,8 @@ export default function AttachmentActivititesListScreen({ route }) {
     const [currentImageWidth, setCurrentImageWidth] = React.useState(null);
     const [currentImageHeight, setCurrentImageHeight] = React.useState(null);
     const [codigoAtividade, setCodigoAtividade] = React.useState(null);
+
+    const [selectedId, setSelectedId] = React.useState(null);
 
     const [downloadInfo, setDownloadInfo] = React.useState({
         loading: false,
@@ -68,6 +66,8 @@ export default function AttachmentActivititesListScreen({ route }) {
             loading: true,
             name: item.NOME_ARQUIVO,
         });
+
+        setSelectedId(item.ID)
 
         let err = false;
         let alertMessage = 'Houve um erro ao efetuar o download do arquivo';
@@ -164,17 +164,19 @@ export default function AttachmentActivititesListScreen({ route }) {
                 setHasLoadedAll(true);
 
         } catch (err) {
-            ToastAndroid.show("Ops, não foi possivel buscar os anexos do processo!", ToastAndroid.SHORT)
+            ToastAndroid.show("Ops, não foi possivel buscar os anexos da atividade!", ToastAndroid.SHORT)
         }
 
         setLoading(false);
     }
 
     function handleRenderItem({ item }) {
-        console.tron.log(item);
         setCodigoAtividade(item.CODIGO_ATIVIDADE)
+
+        let backgroundColor = item.ID === selectedId ? "#f1f1f1" : "#fff";
+
         return (
-            <View style={styles.item}>
+            <View style={{ backgroundColor: backgroundColor, paddingVertical: 5, paddingHorizontal: 10, flexDirection: 'row' }}>
                 <View>
                     <TouchableOpacity
                         activeOpacity={0.7}
@@ -272,6 +274,7 @@ export default function AttachmentActivititesListScreen({ route }) {
                 ItemSeparatorComponent={() => <View style={styles.separator} />}
                 keyExtractor={({ ID }) => String(ID)}
                 renderItem={handleRenderItem}
+                extraData={selectedId}
                 onEndReachedThreshold={0.5}
             />
 
@@ -309,6 +312,12 @@ export default function AttachmentActivititesListScreen({ route }) {
 const styles = StyleSheet.create({
     item: {
         backgroundColor: '#fff',
+        paddingVertical: 5,
+        paddingHorizontal: 10,
+        flexDirection: 'row',
+    },
+    itemSelected: {
+        backgroundColor: '#f1f1f1',
         paddingVertical: 5,
         paddingHorizontal: 10,
         flexDirection: 'row',

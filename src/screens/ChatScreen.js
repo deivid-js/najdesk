@@ -118,6 +118,11 @@ export default function ChatScreen({ route, navigator }) {
     loading: false,
     name: '',
   });
+  
+  const [uploadInfo, setUploadInfo] = React.useState({
+    loading: false,
+    name: '',
+  });
 
   const [currentUriImage, setCurrentUriImage] = React.useState(null);
   const [openedImageModal, setOpenedImageModal] = React.useState(false);
@@ -141,6 +146,12 @@ export default function ChatScreen({ route, navigator }) {
     /*const imageBaseName = `${auth.adv.codigo}-${
       auth.user.id
     }-${new Date().toISOString()}`;*/
+
+    // setLoading(true);
+    setUploadInfo({
+      loading: true,
+      name: '',
+    });
 
     let err = false;
     let persistedMessage = {};
@@ -167,6 +178,10 @@ export default function ChatScreen({ route, navigator }) {
       persistedMessage.conteudo = persistedMessage.id;
     } catch (errMsg) {
       err = true;
+      // setLoading(false);
+      setUploadInfo({
+        loading: false
+      });
     }
 
     if (err) {
@@ -193,6 +208,11 @@ export default function ChatScreen({ route, navigator }) {
       is_owner: 1,
       is_auto: false,
     };
+
+    // setLoading(false);
+    setUploadInfo({
+      loading: false
+    });
 
     setMessages([newMessage, ...messages]);
   }
@@ -1359,6 +1379,26 @@ export default function ChatScreen({ route, navigator }) {
               numberOfLines={1}
               ellipsizeMode="middle">
               {downloadInfo.name || 'Nome do arquivo não encontrado'}
+            </NajText>
+          </View>
+          <ActivityIndicator color="#fafafa" animating size="large" />
+        </View>
+      )}
+
+      {uploadInfo.loading && (
+        <View style={styles.audioCounterContainer}>
+          <View style={{ flex: 1, paddingRight: 15 }}>
+            <NajText
+              style={{ color: '#fafafa' }}
+              numberOfLines={1}
+              ellipsizeMode="middle">
+              Aguarde...
+            </NajText>
+            <NajText
+              style={{ color: '#fafafa', fontWeight: 'bold' }}
+              numberOfLines={1}
+              ellipsizeMode="middle">
+              {'Aguarde, estamos efetuando o upload da imagem'}
             </NajText>
           </View>
           <ActivityIndicator color="#fafafa" animating size="large" />
