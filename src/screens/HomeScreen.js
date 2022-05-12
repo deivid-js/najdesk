@@ -83,6 +83,8 @@ export default function HomeScreen() {
 	const [totalProcess30Days, setTotalProcess30Days] = React.useState(0);
 	const [totalEvents, setTotalEvents] = React.useState(0);
 
+  const [loadingNotification, setLoadingNotification] = React.useState(false);
+
 	async function monitora(rotina) {
 		try {
 			await ADVService.get(`/api/v1/app/${rotina}/monitora`);
@@ -147,7 +149,7 @@ export default function HomeScreen() {
 
 	function getUrlBase() {
 		if (__DEV__) {
-			return 'http://192.168.1.9:8000/';
+			return 'http://192.168.1.14:8000/';
 			return 'http://najadvweb.com/';
 		}
 
@@ -411,17 +413,41 @@ export default function HomeScreen() {
     let processId = lastNotification?.lastReceived?.message?.id_processo;
 
     if (lastNotification?.lastAction === '@ACT/open_to_pay' && isSameAdv && isSameUser) { // abre a tabela do financeiro 'A PAGAR'
-      handleNavigateToPay();
+      setLoadingNotification(true);
+      setTimeout(() => {
+        handleNavigateToPay();
+        setLoadingNotification(false);
+      }, 3500)
     } else if (lastNotification?.lastAction === '@ACT/open_to_receive' && isSameAdv && isSameUser) { // abre a tabela do financeiro 'A RECEBER'
-      handleNavigateToReceive();
+      setLoadingNotification(true);
+      setTimeout(() => {
+        handleNavigateToReceive();
+        setLoadingNotification(false);
+      }, 3500)
     } else if (lastNotification?.lastAction === '@ACT/open_process_activities' && isSameAdv && isSameUser && processId) { // abre a tabela de 'ATIVIDADES DO PROCESSO'
-      handleNavigateProcessActivities(processId);
+      setLoadingNotification(true);
+      setTimeout(() => {
+        handleNavigateProcessActivities(processId);
+        setLoadingNotification(false);
+      }, 3500)
     } else if (lastNotification?.lastAction === '@ACT/open_activities' && isSameAdv && isSameUser) { // abre a tabela de 'ATIVIDADES'
-      handleNavigateActivities();
+      setLoadingNotification(true);
+      setTimeout(() => {
+        handleNavigateActivities();
+        setLoadingNotification(false);
+      }, 3500)
     } else if (lastNotification?.lastAction === '@ACT/open_events' && isSameAdv && isSameUser) { // abre a tabela de 'AGENDAMENTOS'
-      handleNavigateAgenda();
+      setLoadingNotification(true);
+      setTimeout(() => {
+        handleNavigateAgenda();
+        setLoadingNotification(false);
+      }, 3500)
     } else if (lastNotification?.lastAction === '@ACT/release_adv' && isSameUser) {
-      handleNavigateAdvChoice();
+      setLoadingNotification(true);
+      setTimeout(() => {
+        handleNavigateAdvChoice();
+        setLoadingNotification(false);
+      }, 3500)
     } else if (lastNotification?.lastAction === '@ACT/new_message' && isSameAdv && isSameUser) {
       setNotReadMessages(notReadMessages + 1);
       setReadMessages(readMessages + 1);
@@ -432,7 +458,11 @@ export default function HomeScreen() {
       const { message } = lastNotification.lastReceived;
 
       if (message.id_cliente == auth.adv.codigo) {
-        handleNavigateChat();
+        setLoadingNotification(true);
+        setTimeout(() => {
+          handleNavigateChat();
+          setLoadingNotification(false);
+        }, 3500)
       } else if (message.id_cliente) {
         tryLoadAnAdv(message.id_cliente);
         //handleNavigateChat();
@@ -448,6 +478,7 @@ export default function HomeScreen() {
       //Alert.alert('Atenção', `Esta mensagem foi enviada para: ${message.apelido || message.nome}.`);
       ToastAndroid.show('Esta mensagem foi enviada para outra pessoa que utiliza este mesmo dispositivo!', ToastAndroid.SHORT)
     }
+
   }, [lastNotification]);
 
   React.useEffect(() => {
@@ -534,19 +565,35 @@ export default function HomeScreen() {
   function getBadgeEventContainer() {
     return (
       <View style={{ flexDirection: 'row' }}>
-        <NajText
-          style={{
-            backgroundColor: '#d00',
+        {totalEvents > 0 && (
+          <NajText
+            style={{
+              backgroundColor: '#d00',
+                fontSize: 12,
+                color: '#fff',
+                textAlign: 'center',
+                paddingVertical: 2,
+                paddingHorizontal: 6,
+                borderRadius: 50,
+                fontWeight: 'bold',
+            }}>
+            {totalEvents}
+          </NajText>
+        )}
+        {!totalEvents && (
+          <NajText
+            style={{
               fontSize: 12,
-              color: '#fff',
+              color: '#000',
               textAlign: 'center',
               paddingVertical: 2,
               paddingHorizontal: 6,
               borderRadius: 50,
               fontWeight: 'bold',
-          }}>
-          {totalEvents}
-        </NajText>
+            }}>
+            {totalEvents}
+          </NajText>
+        )}
       </View>
     );
   }
@@ -930,6 +977,14 @@ export default function HomeScreen() {
   }
 
   function getMainComponent() {
+    if (loadingNotification) {
+      return (
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+          <ActivityIndicator color={colors.secundary} animating size="large" />
+        </View>
+      );
+    }
+
     return (
       <>
         {getModalPesquisaNps()}
